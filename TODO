@@ -1,0 +1,18 @@
+Visa :
+    - transformable et non transfomable
+
+Visa transformable : 
+    - etudiant, missionaire, travailleur ...
+
+Sprint 1 :
+L'application doit saisir le visa transformable
+Nouvelle demande de visa
+Avant la fin du visa normal, il doit faire un demande de visa transformable
+chez les ministers interieurs
+Dossier a fournir selon le type de travailleur ...
+Fiche de renseignement -> Etat Civil -> Information du visa transformable -> Type Visa Tadiavina
+(type etudiant et travailleur)
+Misy koa ny type de demande
+
+Output farany -> Carte residant sy visa (mitovy ny information) == a imprimer
+Misy koa ny nouvelle demande de duplicate pour carte residant sy visa
