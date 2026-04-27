@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Visas - Ministère</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .badge-titre-simple { background:#d1ecf1;color:#0c5460;padding:2px 8px;border-radius:10px;font-size:.78rem; }
+        .badge-duplicata    { background:#f8d7da;color:#721c24;padding:2px 8px;border-radius:10px;font-size:.78rem; }
+        .filter-bar { display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px; }
+        .filter-bar select, .filter-bar input { padding:6px 10px;border:1px solid #ced4da;border-radius:4px;font-size:.9rem; }
+
+        @media print {
+            body * { visibility: hidden; }
+            .print-section, .print-section * { visibility: visible; }
+            .print-section { position: absolute; left: 0; top: 0; width: 100%; padding: 30px; box-sizing: border-box; }
+            .print-doc { border: 2px solid #333; padding: 24px; margin-bottom: 30px; font-family: serif; }
+            .print-doc h2 { text-align: center; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid #333; padding-bottom: 8px; margin-bottom: 16px; }
+            .print-doc table { width:100%;border-collapse:collapse;font-size:1rem; }
+            .print-doc td { padding:6px 10px;border:1px solid #999; }
+            .print-doc td:first-child { font-weight:bold;width:40%;background:#f5f5f5; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body data-page="visas">
+    <header class="header no-print">
+        <h1>
+            <a href="index.html" style="color:white;text-decoration:none;">Ministère des Visas</a>
+            <span style="font-size:.6rem;opacity:.8;">Visas (Titres simples &amp; Duplicatas)</span>
+        </h1>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="demandeurs.html">Demandeurs</a></li>
+                <li><a href="demandes.html">Demandes</a></li>
+                <li><a href="visas.html" class="active">Visas</a></li>
+                <li><a href="visas-transformables.html">🔄 Visas Transformables</a></li>
+                <li><a href="cartes-residence.html">🪪 Cartes de Résidence</a></li>
+                <li><a href="antecedents.html">📜 Antécédents</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-container no-print">
+        <section class="search-container">
+            <div class="filter-bar">
+                <button class="btn btn-success" onclick="visaManager.showVisaForm()">+ Nouveau Visa (Titre Simple)</button>
+                <button class="btn btn-warning" onclick="visaManager.showDuplicataForm()">+ Duplicata</button>
+                <select id="filterCategorie" onchange="visaManager.applyFilter()">
+                    <option value="">Tous (Titre simple + Duplicata)</option>
+                    <option value="TITRE_SIMPLE">Titre Simple</option>
+                    <option value="DUPLICATA">Duplicata</option>
+                </select>
+                <input type="text" id="filterRef" placeholder="Rechercher par référence..." oninput="visaManager.applyFilter()" style="min-width:200px;">
+            </div>
+        </section>
+
+        <div id="alertContainer"></div>
+
+        <section class="table-container">
+            <table class="table" id="visasTable">
+                <thead>
+                    <tr>
+                        <th>Référence</th>
+                        <th>Catégorie</th>
+                        <th>Demandeur</th>
+                        <th>Passeport</th>
+                        <th>Visa d'origine (duplicata)</th>
+                        <th>Date Début</th>
+                        <th>Date Fin</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="8" class="text-center">Chargement...</td></tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- Modal Titre Simple / Duplicata -->
+    <div id="visaModal" class="modal no-print" style="display:none;">
+        <div class="modal-content" style="max-width:560px;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Ajouter un Visa</h2>
+                <button class="close-btn" onclick="visaManager.closeModal()">&times;</button>
+            </div>
+            <form id="visaForm" onsubmit="event.preventDefault(); visaManager.submitForm();">
+                <div class="form-group">
+                    <label>Catégorie *</label>
+                    <div style="display:flex;gap:16px;margin-top:6px;">
+                        <label><input type="radio" name="visaCategorie" value="TITRE_SIMPLE" checked> Titre Simple</label>
+                        <label><input type="radio" name="visaCategorie" value="DUPLICATA"> Duplicata</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="refVisa">Référence du Visa *</label>
+                    <input type="text" id="refVisa" name="refVisa" placeholder="Ex: VN-2025-001" required>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="form-group">
+                        <label for="dateDebut">Date Début *</label>
+                        <input type="date" id="dateDebut" name="dateDebut" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateFin">Date Fin *</label>
+                        <input type="date" id="dateFin" name="dateFin" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="passport">Passeport *</label>
+                    <select id="passport" name="passport" required></select>
+                </div>
+                <div class="form-group" id="demandeGroup">
+                    <label for="demande">Demande associée *</label>
+                    <select id="demande" name="demande" required></select>
+                </div>
+                <div class="form-group" id="duplicataGroup" style="display:none;">
+                    <label for="visaOriginal">Visa d'origine (pour duplicata)</label>
+                    <select id="visaOriginal" name="visaOriginal"></select>
+                </div>
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <button type="button" class="btn btn-secondary" onclick="visaManager.closeModal()">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="printArea" class="print-section" style="display:none;"></div>
+
+    <script src="js/app.js"></script>
+    <script src="js/visas.js"></script>
+</body>
+</html>

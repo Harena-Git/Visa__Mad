@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Demandeurs - Ministère des Visas</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body data-page="demandeurs">
+    <!-- Header -->
+    <header class="header">
+        <h1>
+            <a href="index.html" style="color: white; text-decoration: none;">
+                🏛️ Ministère des Visas
+            </a>
+            <span style="font-size: 0.6rem; opacity: 0.8;">Gestion des Demandeurs</span>
+        </h1>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">🏠 Accueil</a></li>
+                <li><a href="demandeurs.html" class="active">👥 Demandeurs</a></li>
+                <li><a href="visas-transformables.html">🔄 Visas Transformables</a></li>
+                <li><a href="cartes-residence.html">🪪 Cartes de Résidence</a></li>
+                <li><a href="antecedents.html">📜 Antécédents</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Search and Actions -->
+        <section class="search-container">
+            <div class="search-filters">
+                <input type="text" id="searchInput" class="search-input" placeholder="Rechercher par nom, prénom, email...">
+                <select id="nationaliteFilter" class="search-input">
+                    <option value="">Toutes les nationalités</option>
+                </select>
+                <select id="situationFilter" class="search-input">
+                    <option value="">Toutes les situations</option>
+                </select>
+                <button class="btn btn-primary" onclick="demandeurManager.searchDemandeurs()">🔍 Rechercher</button>
+                <button class="btn btn-success" onclick="demandeurManager.showDemandeurForm()">➕ Ajouter</button>
+            </div>
+        </section>
+
+        <!-- Alert Container -->
+        <div id="alertContainer"></div>
+
+        <!-- Table -->
+        <section class="table-container">
+            <table class="table" id="demandeursTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>Nationalité</th>
+                        <th>Situation Fam.</th>
+                        <th>Date Création</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <div class="loading"></div>
+                            <p>Chargement des demandeurs...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Pagination -->
+        <section class="pagination-container">
+            <div class="pagination">
+                <button class="btn btn-secondary" onclick="demandeurManager.previousPage()" id="prevBtn">⬅ Précédent</button>
+                <span id="pageInfo">Page 1 sur 1</span>
+                <button class="btn btn-secondary" onclick="demandeurManager.nextPage()" id="nextBtn">Suivant ➡</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal -->
+    <div id="demandeurModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Ajouter un Demandeur</h2>
+                <button class="close-btn" onclick="demandeurManager.closeModal()">&times;</button>
+            </div>
+            <form id="demandeurForm" onsubmit="event.preventDefault(); demandeurManager.submitForm();">
+                <div class="form-group">
+                    <label for="nom">Nom *</label>
+                    <input type="text" id="nom" name="nom" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="prenom">Prénom *</label>
+                    <input type="text" id="prenom" name="prenom" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="telephone">Téléphone</label>
+                    <input type="tel" id="telephone" name="telephone">
+                </div>
+                
+                <div class="form-group">
+                    <label for="adresse">Adresse à Madagascar</label>
+                    <textarea id="adresse" name="adresse" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dtn">Date de Naissance</label>
+                    <input type="date" id="dtn" name="dtn">
+                </div>
+                
+                <div class="form-group">
+                    <label for="nomJeuneFille">Nom de Jeune Fille</label>
+                    <input type="text" id="nomJeuneFille" name="nomJeuneFille">
+                </div>
+                
+                <div class="form-group">
+                    <label for="nationalite">Nationalité *</label>
+                    <select id="nationalite" name="nationalite" required>
+                        <option value="">Sélectionner...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="situationFamille">Situation Familiale *</label>
+                    <select id="situationFamille" name="situationFamille" required>
+                        <option value="">Sélectionner...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
+                    <button type="button" class="btn btn-secondary" onclick="demandeurManager.closeModal()">❌ Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Étendre le demandeurManager avec les fonctionnalités de recherche et pagination
+        demandeurManager.currentPage = 1;
+        demandeurManager.pageSize = 10;
+        demandeurManager.totalPages = 1;
+        demandeurManager.currentSearch = '';
+
+        // Fonction de recherche
+        demandeurManager.searchDemandeurs = async function() {
+            const searchTerm = document.getElementById('searchInput').value;
+            const nationalite = document.getElementById('nationaliteFilter').value;
+            const situation = document.getElementById('situationFilter').value;
+
+            try {
+                let url;
+                if (searchTerm) {
+                    url = `/demandeurs/search/nom?nom=${encodeURIComponent(searchTerm)}`;
+                } else if (nationalite) {
+                    url = `/demandeurs/search/nationalite/${nationalite}`;
+                } else if (situation) {
+                    url = `/demandeurs/search/situation-famille/${situation}`;
+                } else {
+                    url = '/demandeurs';
+                }
+
+                const demandeurs = await utils.apiRequest(url);
+                this.displayDemandeurs(demandeurs);
+            } catch (error) {
+                utils.showAlert('Erreur lors de la recherche', 'danger');
+            }
+        };
+
+        // Gestion de la pagination
+        demandeurManager.updatePagination = function() {
+            const pageInfo = document.getElementById('pageInfo');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            pageInfo.textContent = `Page ${this.currentPage} sur ${this.totalPages}`;
+            prevBtn.disabled = this.currentPage <= 1;
+            nextBtn.disabled = this.currentPage >= this.totalPages;
+        };
+
+        demandeurManager.previousPage = function() {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+                this.loadDemandeurs();
+            }
+        };
+
+        demandeurManager.nextPage = function() {
+            if (this.currentPage < this.totalPages) {
+                this.currentPage++;
+                this.loadDemandeurs();
+            }
+        };
+
+        // Améliorer la fonction displayDemandeurs pour la pagination
+        const originalDisplayDemandeurs = demandeurManager.displayDemandeurs;
+        demandeurManager.displayDemandeurs = function(demandeurs) {
+            const tbody = document.querySelector('#demandeursTable tbody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            if (demandeurs.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <p>Aucun demandeur trouvé</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const startIndex = (this.currentPage - 1) * this.pageSize;
+            const endIndex = Math.min(startIndex + this.pageSize, demandeurs.length);
+            const pageData = demandeurs.slice(startIndex, endIndex);
+            
+            pageData.forEach(demandeur => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${demandeur.id || ''}</td>
+                    <td>${demandeur.nom || ''}</td>
+                    <td>${demandeur.prenom || ''}</td>
+                    <td>${demandeur.email || ''}</td>
+                    <td>${demandeur.telephone || ''}</td>
+                    <td>${demandeur.nationalite?.libelle || ''}</td>
+                    <td>${demandeur.situationFamille?.libelle || ''}</td>
+                    <td>${utils.formatDate(demandeur.createdAt)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-warning btn-sm" onclick="demandeurManager.editDemandeur('${demandeur.id}')">Modifier</button>
+                            <button class="btn btn-danger btn-sm" onclick="demandeurManager.deleteDemandeur('${demandeur.id}')">Supprimer</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            this.totalPages = Math.ceil(demandeurs.length / this.pageSize);
+            this.updatePagination();
+        };
+
+        // Améliorer la fonction loadReferenceData pour remplir les filtres
+        const originalLoadReferenceData = demandeurManager.loadReferenceData;
+        demandeurManager.loadReferenceData = async function() {
+            await originalLoadReferenceData.call(this);
+            
+            // Remplir les filtres
+            const nationaliteFilter = document.getElementById('nationaliteFilter');
+            const situationFilter = document.getElementById('situationFilter');
+            
+            if (nationaliteFilter) {
+                const nationalites = await utils.apiRequest('/nationalites');
+                nationaliteFilter.innerHTML = '<option value="">Toutes les nationalités</option>';
+                nationalites.forEach(nat => {
+                    const option = document.createElement('option');
+                    option.value = nat.id;
+                    option.textContent = nat.libelle;
+                    nationaliteFilter.appendChild(option);
+                });
+            }
+            
+            if (situationFilter) {
+                const situations = await utils.apiRequest('/situations-famille');
+                situationFilter.innerHTML = '<option value="">Toutes les situations</option>';
+                situations.forEach(sit => {
+                    const option = document.createElement('option');
+                    option.value = sit.id;
+                    option.textContent = sit.libelle;
+                    situationFilter.appendChild(option);
+                });
+            }
+        };
+
+        // Ajouter le support des raccourcis clavier
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'n') {
+                event.preventDefault();
+                demandeurManager.showDemandeurForm();
+            }
+            if (event.ctrlKey && event.key === 'f') {
+                event.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+        });
+
+        // Améliorer la fonction submitForm pour la validation
+        const originalSubmitForm = demandeurManager.submitForm;
+        demandeurManager.submitForm = async function() {
+            const form = document.getElementById('demandeurForm');
+            
+            // Validation basique
+            const nom = form.nom.value.trim();
+            const prenom = form.prenom.value.trim();
+            const email = form.email.value.trim();
+            const nationalite = form.nationalite.value;
+            const situationFamille = form.situationFamille.value;
+            
+            if (!nom || !prenom || !email || !nationalite || !situationFamille) {
+                utils.showAlert('Veuillez remplir tous les champs obligatoires', 'warning');
+                return;
+            }
+            
+            // Validation email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                utils.showAlert('Veuillez entrer une adresse email valide', 'warning');
+                return;
+            }
+            
+            await originalSubmitForm.call(this);
+        };
+
+        // Ajouter un style pour le lien actif dans la navigation
+        const style = document.createElement('style');
+        style.textContent = `
+            .nav-links a.active {
+                background-color: rgba(255, 255, 255, 0.2);
+                border-radius: 5px;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

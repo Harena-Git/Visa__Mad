@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartes de Résidence - Ministère</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        @media print {
+            body * { visibility: hidden; }
+            .print-section, .print-section * { visibility: visible; }
+            .print-section { position: absolute; left: 0; top: 0; width: 100%; border: 2px solid black; padding: 20px; text-align: center; font-size: 1.5rem; }
+            .print-section h1 { font-size: 2rem; margin-bottom: 20px; text-decoration: underline; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body data-page="cartes-residence">
+    <header class="header no-print">
+        <h1>
+            <a href="index.html" style="color: white; text-decoration: none;">🏛️ Ministère des Visas</a>
+            <span style="font-size: 0.6rem; opacity: 0.8;">Cartes de Résidence</span>
+        </h1>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">🏠 Accueil</a></li>
+                <li><a href="demandeurs.html">👥 Demandeurs</a></li>
+                <li><a href="demandes.html">📋 Demandes</a></li>
+                <li><a href="visas-transformables.html">🔄 Visas Transformables</a></li>
+                <li><a href="cartes-residence.html" class="active">🪪 Cartes de Résidence</a></li>
+                <li><a href="antecedents.html">📜 Antécédents</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-container no-print">
+        <section class="search-container">
+            <div class="search-filters">
+                <button class="btn btn-success" onclick="carteResidenceManager.showForm()">➕ Nouvelle Carte</button>
+            </div>
+        </section>
+
+        <div id="alertContainer"></div>
+
+        <section class="table-container">
+            <table class="table" id="cartesTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Référence</th>
+                        <th>Date Début</th>
+                        <th>Date Fin</th>
+                        <th>Passeport</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="6" class="text-center">Chargement...</td></tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- Modal -->
+    <div id="carteModal" class="modal no-print">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Ajouter une Carte</h2>
+                <button class="close-btn" onclick="carteResidenceManager.closeModal()">&times;</button>
+            </div>
+            <form id="carteForm" onsubmit="event.preventDefault(); carteResidenceManager.submitForm();">
+                <div class="form-group">
+                    <label for="refCarteResidence">Référence de la Carte *</label>
+                    <input type="text" id="refCarteResidence" name="refCarteResidence" required>
+                </div>
+                <div class="form-group">
+                    <label for="dateDebut">Date Début *</label>
+                    <input type="date" id="dateDebut" name="dateDebut" required>
+                </div>
+                <div class="form-group">
+                    <label for="dateFin">Date Fin *</label>
+                    <input type="date" id="dateFin" name="dateFin" required>
+                </div>
+                <div class="form-group">
+                    <label for="passport">Passeport *</label>
+                    <select id="passport" name="passport" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="demande">Demande Associée * (ex: Duplicata ou Nouveau)</label>
+                    <select id="demande" name="demande" required></select>
+                </div>
+                
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
+                    <button type="button" class="btn btn-secondary" onclick="carteResidenceManager.closeModal()">❌ Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="printArea" class="print-section" style="display:none;"></div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const carteResidenceManager = {
+            loadData: async function() {
+                try {
+                    const cartes = await utils.apiRequest('/cartes-residence');
+                    
+                    const tbody = document.querySelector('#cartesTable tbody');
+                    tbody.innerHTML = '';
+                    if (cartes.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center"><p>Aucune carte trouvée</p></td></tr>';
+                        return;
+                    }
+                    cartes.forEach(carte => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${carte.id || ''}</td>
+                            <td>${carte.refCarteResidence || ''}</td>
+                            <td>${utils.formatDate(carte.dateDebut)}</td>
+                            <td>${utils.formatDate(carte.dateFin)}</td>
+                            <td>${carte.passport?.numero || ''}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-info btn-sm" onclick="carteResidenceManager.imprimer('${carte.id}', '${carte.refCarteResidence}')">🖨️ Imprimer</button>
+                                    <button class="btn btn-warning btn-sm" onclick="carteResidenceManager.edit('${carte.id}')">Modifier</button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } catch (error) {}
+            },
+            
+            imprimer: function(id, ref) {
+                const printArea = document.getElementById('printArea');
+                printArea.innerHTML = `<h1>CARTE DE RÉSIDENT</h1><p><strong>RÉFÉRENCE :</strong> ${ref}</p><br><br><br><i>Délivrée par le Ministère des Visas</i><br><i>Valable sous présentation d'un passeport valide</i>`;
+                printArea.style.display = 'block';
+                window.print();
+                printArea.style.display = 'none';
+            },
+
+            edit: async function(id) {
+                const carte = await utils.apiRequest(`/cartes-residence/${id}`);
+                this.showForm(carte);
+            },
+
+            showForm: function(carte = null) {
+                const modal = document.getElementById('carteModal');
+                const form = document.getElementById('carteForm');
+                form.reset();
+                if (carte) {
+                    form.dataset.id = carte.id;
+                    document.getElementById('refCarteResidence').value = carte.refCarteResidence || '';
+                    document.getElementById('dateDebut').value = carte.dateDebut ? carte.dateDebut.split('T')[0] : '';
+                    document.getElementById('dateFin').value = carte.dateFin ? carte.dateFin.split('T')[0] : '';
+                    document.getElementById('passport').value = carte.passport?.id || '';
+                    document.getElementById('demande').value = carte.demande?.id || '';
+                } else {
+                    delete form.dataset.id;
+                }
+                modal.style.display = 'block';
+            },
+
+            closeModal: function() { document.getElementById('carteModal').style.display = 'none'; },
+
+            submitForm: async function() {
+                const form = document.getElementById('carteForm');
+                const data = {
+                    refCarteResidence: form.refCarteResidence.value,
+                    dateDebut: form.dateDebut.value,
+                    dateFin: form.dateFin.value,
+                    passport: { id: form.passport.value },
+                    demande: { id: form.demande.value }
+                };
+                if (form.dataset.id) await utils.apiRequest(`/cartes-residence/${form.dataset.id}`, { method: 'PUT', body: JSON.stringify(data) });
+                else await utils.apiRequest('/cartes-residence', { method: 'POST', body: JSON.stringify(data) });
+                
+                this.closeModal();
+                this.loadData();
+            },
+
+            loadReferenceData: async function() {
+                try {
+                    const [passports, demandes] = await Promise.all([ utils.apiRequest('/passports'), utils.apiRequest('/demandes') ]);
+                    const selectPass = document.getElementById('passport');
+                    selectPass.innerHTML = '<option value="">Sélectionner...</option>';
+                    passports.forEach(p => selectPass.appendChild(new Option(p.numero, p.id)));
+
+                    const selectDem = document.getElementById('demande');
+                    selectDem.innerHTML = '<option value="">Sélectionner...</option>';
+                    demandes.forEach(d => selectDem.appendChild(new Option(d.id, d.id)));
+                } catch(e) {}
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.body.dataset.page === 'cartes-residence') {
+                carteResidenceManager.loadReferenceData();
+                carteResidenceManager.loadData();
+            }
+        });
+    </script>
+</body>
+</html>
