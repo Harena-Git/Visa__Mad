@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système de Gestion des Visas - Ministère</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>
+            🏛️ Ministère des Visas
+            <span style="font-size: 0.6rem; opacity: 0.8;">Système de Gestion</span>
+        </h1>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">🏠 Accueil</a></li>
+                <li><a href="demandeurs.html">👥 Demandeurs</a></li>
+                <li><a href="demandes.html">📋 Demandes</a></li>
+                <li><a href="visas.html">🛂 Visas</a></li>
+                <li><a href="visas-transformables.html">🔄 Visas Transformables</a></li>
+                <li><a href="cartes-residence.html">🪪 Cartes de Résidence</a></li>
+                <li><a href="antecedents.html">📜 Antécédents</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h2 class="hero-title">Bienvenue dans le Système de Gestion des Visas</h2>
+                <p class="hero-subtitle">Plateforme centralisée pour la gestion des demandes de visas et des demandeurs</p>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalDemandeurs">-</div>
+                        <div class="stat-label">Demandeurs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalDemandes">-</div>
+                        <div class="stat-label">Demandes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="recentDemandes">-</div>
+                        <div class="stat-label">Demandes Récentes</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions">
+            <h2 class="section-title">Actions Rapides</h2>
+            <div class="home-grid">
+                <a href="demandeurs.html" class="home-card">
+                    <div class="home-card-icon">👥</div>
+                    <h3>Gestion des Demandeurs</h3>
+                    <p>Ajouter, modifier et gérer les informations des demandeurs de visas</p>
+                </a>
+                
+                <a href="demandes.html" class="home-card">
+                    <div class="home-card-icon">📋</div>
+                    <h3>Gestion des Demandes</h3>
+                    <p>Suivre et traiter toutes les demandes de visas soumises</p>
+                </a>
+                
+                <div class="home-card" onclick="showReports()">
+                    <div class="home-card-icon">📊</div>
+                    <h3>Rapports et Statistiques</h3>
+                    <p>Consulter les rapports détaillés et les statistiques de traitement</p>
+                </div>
+                
+                <div class="home-card" onclick="showSearch()">
+                    <div class="home-card-icon">🔍</div>
+                    <h3>Recherche Avancée</h3>
+                    <p>Rechercher des demandeurs ou des demandes avec des filtres avancés</p>
+                </div>
+
+                <a href="antecedents.html" class="home-card">
+                    <div class="home-card-icon">📜</div>
+                    <h3>Antécédents (Duplicata & Transfert)</h3>
+                    <p>Traiter les demandes de duplicata ou de transfert avec recherche automatique</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="recent-activity">
+            <h2 class="section-title">Activité Récente</h2>
+            <div class="activity-grid">
+                <div class="activity-card">
+                    <div class="activity-icon">🆕</div>
+                    <div class="activity-content">
+                        <h4>Nouveaux Demandeurs</h4>
+                        <p id="newDemandeursInfo">Chargement...</p>
+                    </div>
+                </div>
+                
+                <div class="activity-card">
+                    <div class="activity-icon">📈</div>
+                    <div class="activity-content">
+                        <h4>Demandes en Cours</h4>
+                        <p id="pendingDemandesInfo">Chargement...</p>
+                    </div>
+                </div>
+                
+                <div class="activity-card">
+                    <div class="activity-icon">✅</div>
+                    <div class="activity-content">
+                        <h4>Demandes Traitées</h4>
+                        <p id="processedDemandesInfo">Chargement...</p>
+                    </div>
+                </div>
+                
+                <div class="activity-card">
+                    <div class="activity-icon">📅</div>
+                    <div class="activity-content">
+                        <h4>Demandes du Jour</h4>
+                        <p id="todayDemandesInfo">Chargement...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- System Information -->
+        <section class="system-info">
+            <h2 class="section-title">Informations Système</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>🔧 Version Système</h3>
+                    <p>v1.0.0</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>🗄️ Base de Données</h3>
+                    <p>PostgreSQL - Connectée</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>🌐 API Status</h3>
+                    <p class="status-online">● En ligne</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>👤 Utilisateur Actuel</h3>
+                    <p>Administrateur</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Ministère des Visas - Tous droits réservés</p>
+            <div class="footer-links">
+                <a href="#">Aide</a>
+                <a href="#">Documentation</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <script>
+        // Charger les statistiques au chargement de la page
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadDashboardStats();
+            await loadRecentActivity();
+        });
+
+        async function loadDashboardStats() {
+            try {
+                // Charger les statistiques
+                const [demandeursResponse, demandesResponse] = await Promise.all([
+                    fetch('/visa-backoffice/api/demandeurs/count'),
+                    fetch('/visa-backoffice/api/demandes/count')
+                ]);
+
+                const demandeursCount = await demandeursResponse.json();
+                const demandesCount = await demandesResponse.json();
+
+                // Mettre à jour les statistiques
+                document.getElementById('totalDemandeurs').textContent = demandeursCount.count || 0;
+                document.getElementById('totalDemandes').textContent = demandesCount.count || 0;
+
+                // Charger les demandes récentes (7 derniers jours)
+                const recentResponse = await fetch('/visa-backoffice/api/demandes/recent/7');
+                const recentDemandes = await recentResponse.json();
+                document.getElementById('recentDemandes').textContent = recentDemandes.length || 0;
+
+            } catch (error) {
+                console.error('Erreur lors du chargement des statistiques:', error);
+                utils.showAlert('Erreur lors du chargement des statistiques', 'danger');
+            }
+        }
+
+        async function loadRecentActivity() {
+            try {
+                // Charger les demandes du jour
+                const today = new Date().toISOString().split('T')[0];
+                const todayResponse = await fetch(`/visa-backoffice/api/demandes/date-range?startDate=${today}&endDate=${today}`);
+                const todayDemandes = await todayResponse.json();
+
+                document.getElementById('todayDemandesInfo').textContent = `${todayDemandes.length} demandes aujourd'hui`;
+
+                // Charger les demandeurs récents (30 derniers jours)
+                const recentDate = new Date();
+                recentDate.setDate(recentDate.getDate() - 30);
+                const recentDateStr = recentDate.toISOString().split('T')[0];
+                
+                const recentResponse = await fetch(`/visa-backoffice/api/demandeurs/search/creation-range?startDate=${recentDateStr}&endDate=${today}`);
+                const recentDemandeurs = await recentResponse.json();
+
+                document.getElementById('newDemandeursInfo').textContent = `${recentDemandeurs.length} nouveaux demandeurs (30 jours)`;
+
+                // Simuler les demandes en cours et traitées (à adapter selon votre logique métier)
+                document.getElementById('pendingDemandesInfo').textContent = '12 demandes en attente';
+                document.getElementById('processedDemandesInfo').textContent = '145 demandes traitées ce mois';
+
+            } catch (error) {
+                console.error('Erreur lors du chargement de l\'activité récente:', error);
+            }
+        }
+
+        function showReports() {
+            utils.showAlert('Module de rapports en cours de développement', 'warning');
+        }
+
+        function showSearch() {
+            utils.showAlert('Module de recherche avancée en cours de développement', 'warning');
+        }
+    </script>
+
+    <style>
+        /* Styles additionnels pour la page d'accueil */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 15px;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .activity-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .activity-icon {
+            font-size: 2rem;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .activity-content h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .info-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .status-online {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .footer {
+            background: var(--dark-text);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            margin-top: 1rem;
+        }
+
+        .footer-links a {
+            color: white;
+            margin: 0 1rem;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .hero-stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .activity-grid,
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+</html>
