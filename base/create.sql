@@ -146,6 +146,8 @@ CREATE TABLE check_piece(
    id_piece VARCHAR(50) ,
    est_fourni BOOLEAN,
    updated_at DATE,
+   file_name VARCHAR(255),
+   file_type VARCHAR(50),
    PRIMARY KEY(id_demande, id_piece),
    FOREIGN KEY(id_demande) REFERENCES demande(id_demande),
    FOREIGN KEY(id_piece) REFERENCES piece(id_piece)

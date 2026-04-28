@@ -71,7 +71,7 @@
             </div>
         </section>
 
-        <!-- Table -->
+        <!-- Table demande -->
         <section class="table-container">
             <table class="table" id="demandesTable">
                 <thead>
@@ -84,6 +84,7 @@
                         <th>Date Mise à Jour</th>
                         <th>Statut</th>
                         <th>Actions</th>
+                        <th>Pieces Jointes</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -213,6 +214,7 @@
             }
         };
 
+        // JS demande 
         // Améliorer la fonction displayDemandes pour la pagination et statuts
         const originalDisplayDemandes = demandeManager.displayDemandes;
         demandeManager.displayDemandes = function(demandes) {
@@ -252,6 +254,11 @@
                         <div class="action-buttons">
                             <button class="btn btn-warning btn-sm" onclick="demandeManager.editDemande('${demande.id}')">Modifier</button>
                             <button class="btn btn-danger btn-sm" onclick="demandeManager.deleteDemande('${demande.id}')">Supprimer</button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-info btn-sm" onclick="demandeManager.viewPiecesJointes('${demande.id}')">Importer</button>
                         </div>
                     </td>
                 `;

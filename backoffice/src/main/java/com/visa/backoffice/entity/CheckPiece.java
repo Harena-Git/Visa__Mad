@@ -1,7 +1,13 @@
 package com.visa.backoffice.entity;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "check_piece")
@@ -22,6 +28,12 @@ public class CheckPiece {
     @ManyToOne
     @JoinColumn(name = "id_piece", referencedColumnName = "id_piece", insertable = false, updatable = false)
     private Piece piece;
+
+    @Column(name = "file_name", nullable = false)
+    private String fileName;
+
+    @Column(name = "file_type", nullable = false)
+    private String fileType;
 
     public CheckPiece() {}
 
@@ -63,5 +75,21 @@ public class CheckPiece {
 
     public void setPiece(Piece piece) {
         this.piece = piece;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
     }
 }
