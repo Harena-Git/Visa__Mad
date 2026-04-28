@@ -1,123 +1,149 @@
-# PROJET : SYSTÈME DE GESTION DE VISA
+PROJET : SYSTÈME DE GESTION DE VISA
+TODO GLOBAL (VERSION CORRIGÉE & ALIGNÉE AU SCRIPT SQL)
+======================================================
 
-## INTRODUCTION
+## OBJECTIF
 
-Ce document réorganise et explique les tâches (TODO) du projet en les structurant clairement par sprint (1, 2 et 3).
-L’objectif est de comprendre les fonctionnalités à développer étape par étape.
+Développer une application de gestion de visas permettant :
+
+* la saisie des demandes
+* la gestion des visas transformables
+* le suivi des dossiers
+* la numérisation des pièces
+* la validation finale des dossiers
 
 ---
 
 ## CONCEPTS PRINCIPAUX
 
-1. TYPES DE VISA
+1. TYPE DE VISA
 
-* Visa transformable : peut évoluer vers une carte de résidence
-  Exemples :
+* Définis dans la table : type_visa
+* Valeurs utilisées :
 
-  * Étudiant
-  * Travailleur
-  * Missionnaire
+  * ETUDIANT
+  * TRAVAILLEUR
 
-* Visa non transformable : reste tel quel (non concerné par transformation)
+2. PIÈCES JUSTIFICATIVES
+
+* Définies dans la table : piece
+* Liées au type de visa
+* Attribut clé :
+
+  * est_obligatoire (0 ou 1)
+
+3. SUIVI DES PIÈCES FOURNIES
+
+* Table : check_piece
+* Permet de savoir :
+
+  * si une pièce est fournie (est_fourni)
+  * quel fichier est associé (file_name, file_type)
+
+4. STATUT D’UNE DEMANDE
+
+* Table : statut + statut_demande
+* Permet de suivre :
+
+  * CRÉÉ
+  * SCAN TERMINÉ
+  * VISA APPROUVÉ
 
 ---
 
-## SPRINT 1 : CRÉATION ET SAISIE DES DEMANDES
+## SPRINT 1 : SAISIE DES DEMANDES ET VISAS
 
 OBJECTIF :
-Mettre en place la base du système pour saisir les demandes de visa et gérer les visas transformables.
+Mettre en place la création complète d’un dossier de demande.
 
-FONCTIONNALITÉS PRINCIPALES :
+FONCTIONNALITÉS :
 
-1. ÉCRAN DE SAISIE
+1. CRÉATION D’UN DEMANDEUR
 
-* Formulaire pour créer :
+* Table : demandeur
+* Informations :
 
-  * Un nouveau titre (nouveau visa)
-  * Un duplicata (en cas de perte)
+  * nom, prénom, date de naissance
+  * nationalité (nationalite)
+  * situation familiale (situation_famille)
 
-2. DEMANDE DE VISA
+2. SAISIE DU PASSEPORT
 
-* Création d’une nouvelle demande de visa
-* L’utilisateur saisit :
+* Table : passport
+* Lié au demandeur
 
-  * Informations personnelles (état civil)
-  * Informations du visa
-  * Type de visa demandé (étudiant, travailleur, etc.)
-  * Catégorie de demande
+3. CRÉATION D’UNE DEMANDE
 
-3. VISA TRANSFORMABLE
+* Table : demande
+* Contient :
 
-* Le visa transformable doit être saisi AVANT la fin du visa normal
-* Condition métier :
-  → L’usager doit faire la demande avant expiration du visa actuel
+  * type de visa (type_visa)
+  * catégorie (categorie_demande)
+  * lien vers demandeur
 
-4. PIÈCES JUSTIFICATIVES
+4. GESTION DES VISAS
 
-* Liste des documents dépend du type de visa
-* Certaines pièces sont obligatoires
+a) Visa normal
 
-5. CRUD À IMPLÉMENTER
+* Table : visa
 
-* Table "visa"
+b) Visa transformable
 
-  * titre simple
-  * duplicata
+* Table : visa_transformable
+* Doit être saisi AVANT expiration du visa normal
 
-* Table "visa_transformable"
+5. INITIALISATION DES PIÈCES
 
-  * étudiant
-  * travailleur
+* Pour chaque demande :
+  → créer des lignes dans check_piece
+  → basées sur la table piece
 
-6. RÉSULTAT FINAL (OUTPUT)
+Exemple :
 
-* Génération de :
+* si 3 pièces obligatoires → 3 lignes dans check_piece
 
-  * Carte de résident
-  * Visa
+6. CAS MÉTIERS
 
-→ Les deux contiennent les mêmes informations
-→ Documents imprimables
+* Nouveau visa
+* Duplicata (perte)
+* Transfert (changement passeport)
 
-7. CAS DE PERTE
+7. SORTIE
 
-* Possibilité de demander :
+* Génération :
 
-  * Duplicata carte résident
-  * Duplicata visa
+  * visa
+  * carte_residence
+    → mêmes informations, documents imprimables
 
 ---
 
 ## SPRINT 2 : GESTION DES ANTÉCÉDENTS
 
 OBJECTIF :
-Gérer les cas où les données existent déjà ou non dans le système.
-
-USER STORY :
-Un opérateur doit pouvoir traiter :
-
-* Duplicata
-* Transfert
-  Même si l’usager n’existe pas encore en base.
+Gérer les dossiers existants ou absents dans la base.
 
 ---
 
-CAS 1 : DONNÉES DÉJÀ EXISTANTES
+CAS 1 : DONNÉES EXISTANTES
 
-* Recherche par :
+Recherche :
 
-  * Numéro de passeport
-  * Numéro de demande
+* par numéro de passeport (passport.numero)
+* ou par id_demande
 
-* Le système récupère automatiquement :
+Action :
 
-  * Informations personnelles
-  * Historique du visa
+* récupération automatique :
 
-UTILISATION :
+  * demandeur
+  * visa
+  * historique
 
-* Duplicata → perte de carte
-* Transfert → changement de passeport
+Utilisation :
+
+* duplicata
+* transfert
 
 ---
 
@@ -125,124 +151,149 @@ CAS 2 : DONNÉES ABSENTES
 
 Problème :
 
-* L’usager possède un visa valide
-* MAIS n’est pas enregistré dans le système
+* l’usager possède un visa valide
+* mais n’existe pas en base
 
 SOLUTION :
 
-1. Créer une demande spéciale :
+1. CRÉER UNE DEMANDE D’INJECTION
 
-   * Type : "Nouveau Titre"
-   * Statut : immédiatement "VISA APPROUVÉ"
+* table : demande
+* categorie : "NOUVEAU"
+* statut : VISA APPROUVÉ
 
-→ Cela permet d’injecter ses données dans la base
+2. AJOUTER LES DONNÉES :
 
-2. En parallèle :
+* demandeur
+* passport
+* visa_transformable (historique papier)
 
-* Créer une demande :
+3. CRÉER EN PARALLÈLE :
 
-  * Duplicata OU
-  * Transfert
+* une demande :
+
+  * duplicata OU
+  * transfert
 
 ---
 
-ÉDITION / SORTIE
+SORTIE
 
-* Génération d’un document PDF :
+* Génération d’un document :
   "Attestation récépissé dossier"
 
 Contenu :
 
-* État civil
-* Informations passeport
-* Informations visa
-* Liste des pièces fournies
+* infos demandeur
+* passeport
+* visa
+* liste des pièces (check_piece)
 
 ---
 
-TABLES CONCERNÉES
+TABLES UTILISÉES
 
-* visa_transformable
-* visa
-* carte_residence
+* demandeur
+* passport
 * demande
+* visa
+* visa_transformable
+* carte_residence
 * statut
+* statut_demande
 
 ---
 
 ## SPRINT 3 : NUMÉRISATION ET VERROUILLAGE
 
 OBJECTIF :
-Gérer les fichiers (scan) et sécuriser les dossiers.
-
-USER STORY :
-L’opérateur doit :
-
-* Uploader les pièces justificatives
-* Finaliser définitivement le dossier
+Gérer les fichiers des pièces et verrouiller le dossier.
 
 ---
 
-1. NUMÉRISATION DES DOCUMENTS
+1. UPLOAD DES FICHIERS
 
-* Chaque pièce justificative doit avoir :
+Table utilisée : check_piece
 
-  * Un fichier (image ou PDF)
+Pour chaque pièce :
 
-* Association :
-  pièce → fichier
+* mettre à jour :
 
----
+  * est_fourni = TRUE
+  * file_name (nom du fichier)
+  * file_type (type MIME)
 
-2. CONTRÔLE DE COMPLÉTUDE (DOSSIER FENO)
+Exemple :
 
-* Le bouton "Scan Terminé" est BLOQUÉ tant que :
-  → Toutes les pièces obligatoires n’ont pas de fichier
-
----
-
-3. VERROUILLAGE FINAL
-
-Quand l’opérateur clique sur "Scan Terminé" :
-
-* Le statut devient :
-  → SCAN TERMINÉ
-
-* Conséquence :
-  → AUCUNE modification possible sur :
-
-  * Demande
-  * Informations personnelles
-  * Passeport
+* passport.pdf
+* photo.jpg
 
 ---
 
-DONNÉES UTILISÉES
+2. CONTRÔLE DE COMPLÉTUDE
 
-* Gestion des fichiers :
+Condition :
+Un dossier est COMPLET si :
 
-  * Chemin de stockage des fichiers
+→ toutes les pièces obligatoires (piece.est_obligatoire = 1)
+sont :
+
+* est_fourni = TRUE
+* file_name NON NULL
 
 ---
 
-TABLES CONCERNÉES
+3. BOUTON "SCAN TERMINÉ"
 
-* piece_fournie
-* piece_type
+Visible UNIQUEMENT si :
+→ dossier complet
+
+---
+
+4. VALIDATION FINALE
+
+Action :
+
+* insertion dans statut_demande :
+  → statut = SCAN_TERMINE
+
+---
+
+5. VERROUILLAGE
+
+Une fois SCAN TERMINÉ :
+
+* interdiction de modifier :
+
+  * demande
+  * demandeur
+  * passport
+  * check_piece
+
+(gestion côté backend)
+
+---
+
+TABLES UTILISÉES
+
+* check_piece
+* piece
+* demande
 * statut
+* statut_demande
 
 ---
 
 ## RÉSUMÉ GLOBAL
 
 Sprint 1 :
-→ Création des demandes et saisie des visas
+→ Création complète d’un dossier
 
 Sprint 2 :
-→ Gestion des cas complexes (duplicata, transfert, données absentes)
+→ Gestion des historiques (avec ou sans données)
 
 Sprint 3 :
-→ Upload des documents + verrouillage final
+→ Upload des pièces + validation + verrouillage
 
 ---
 

@@ -108,7 +108,7 @@
         </section>
     </main>
 
-    <!-- Modal -->
+    <!-- Modal Demande -->
     <div id="demandeModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -152,6 +152,39 @@
                     <button type="button" class="btn btn-secondary" onclick="demandeManager.closeModal()">❌ Annuler</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- SPRINT 3: Modal Gestion des Pièces Jointes -->
+    <div id="piecesJointesModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 class="modal-title">📄 Gestion des Pièces - <span id="demandeIdSpan"></span></h2>
+                <button class="close-btn" onclick="demandeManager.closePiecesModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Statut du dossier -->
+                <div id="dossierStatusContainer" style="margin-bottom: 1.5rem;">
+                    <div class="status-indicator">
+                        <p id="dossierStatusText" style="margin: 0.5rem 0;">Statut du dossier: <strong id="dossierStatusBadge">-</strong></p>
+                        <div class="progress-bar">
+                            <div id="completionProgress" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <p id="completionText" style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">0/0 pièces complètes</p>
+                    </div>
+                </div>
+
+                <!-- Liste des pièces -->
+                <div id="piecesContainer" style="margin-bottom: 1.5rem;">
+                    <p>Chargement des pièces...</p>
+                </div>
+
+                <!-- Boutons d'action -->
+                <div class="form-group text-center" style="border-top: 1px solid #ddd; padding-top: 1rem;">
+                    <button class="btn btn-success" id="scanTermineBtn" onclick="demandeManager.marquerScanTermine()" style="display:none;">✅ SCAN TERMINÉ</button>
+                    <button type="button" class="btn btn-secondary" onclick="demandeManager.closePiecesModal()">❌ Fermer</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -353,6 +386,238 @@
             await originalSubmitForm.call(this);
         };
 
+        // ============= SPRINT 3: NUMÉRISATION ET VERROUILLAGE =============
+        
+        // FONCTION 1: Fermer le modal des pièces
+        demandeManager.closePiecesModal = function() {
+            document.getElementById('piecesJointesModal').style.display = 'none';
+        };
+
+        // FONCTION 2: Charger et afficher les pièces pour une demande
+        demandeManager.loadAndDisplayPieces = async function(demandeId) {
+            try {
+                // Récupérer les pièces (check_piece) pour cette demande
+                const checkPieces = await utils.apiRequest(`/demandes/${demandeId}/check-pieces`);
+                const pieces = await utils.apiRequest(`/pieces`);
+
+                document.getElementById('demandeIdSpan').textContent = demandeId;
+                const piecesContainer = document.getElementById('piecesContainer');
+                piecesContainer.innerHTML = '';
+
+                if (!checkPieces || checkPieces.length === 0) {
+                    piecesContainer.innerHTML = '<p class="text-center">Aucune pièce requise pour cette demande</p>';
+                    this.checkDossierComplet(demandeId, []);
+                    return;
+                }
+
+                // Grouper les pièces par type (obligatoire/optionnel)
+                const obligatoires = checkPieces.filter(cp => cp.piece?.estObligatoire);
+                const optionnels = checkPieces.filter(cp => !cp.piece?.estObligatoire);
+
+                let html = '';
+
+                // Afficher les pièces obligatoires
+                if (obligatoires.length > 0) {
+                    html += '<h3 style="color: #d9534f; margin-bottom: 1rem;">📌 Pièces Obligatoires</h3>';
+                    html += '<div class="pieces-list">';
+                    obligatoires.forEach(cp => {
+                        html += this.createPieceRow(cp, demandeId, true);
+                    });
+                    html += '</div>';
+                }
+
+                // Afficher les pièces optionnelles
+                if (optionnels.length > 0) {
+                    html += '<h3 style="color: #5cb85c; margin-bottom: 1rem; margin-top: 1.5rem;">📄 Pièces Optionnelles</h3>';
+                    html += '<div class="pieces-list">';
+                    optionnels.forEach(cp => {
+                        html += this.createPieceRow(cp, demandeId, false);
+                    });
+                    html += '</div>';
+                }
+
+                piecesContainer.innerHTML = html;
+
+                // Vérifier la complétude du dossier
+                this.checkDossierComplet(demandeId, checkPieces);
+
+            } catch (error) {
+                console.error('Erreur lors du chargement des pièces:', error);
+                utils.showAlert('Erreur lors du chargement des pièces', 'danger');
+                document.getElementById('piecesContainer').innerHTML = '<p class="text-center text-danger">Erreur lors du chargement</p>';
+            }
+        };
+
+        // FONCTION 3: Créer une ligne pour afficher une pièce
+        demandeManager.createPieceRow = function(checkPiece, demandeId, isObligatoire) {
+            const fileName = checkPiece.fileName || '';
+            const fileType = checkPiece.fileType || '';
+            const estFourni = checkPiece.estFourni || false;
+            const pieceName = checkPiece.piece?.libelle || 'Pièce inconnue';
+            const pieceId = checkPiece.id?.idPiece || '';
+
+            const statusIcon = estFourni && fileName && fileType ? '✅' : '❌';
+            const statusText = estFourni && fileName && fileType ? 'Fournie' : 'Manquante';
+            const statusClass = estFourni && fileName && fileType ? 'status-complete' : 'status-incomplete';
+
+            return `
+                <div class="piece-row ${statusClass}" style="border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 5px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <p style="margin: 0.5rem 0; font-weight: 600;">
+                                ${statusIcon} ${pieceName}
+                                ${isObligatoire ? '<span style="color: #d9534f; margin-left: 0.5rem;">*</span>' : ''}
+                            </p>
+                            <p style="margin: 0.5rem 0; font-size: 0.9rem; color: #666;">
+                                Fichier: ${fileName ? '<strong>' + fileName + '</strong>' : '<em>Aucun fichier</em>'}
+                            </p>
+                            <p style="margin: 0.5rem 0; font-size: 0.85rem; color: #999;">
+                                Type: ${fileType || 'N/A'}
+                            </p>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="file" id="file-${pieceId}" class="file-input" style="display:none;" onchange="demandeManager.handleFileUpload('${demandeId}', '${pieceId}', this)">
+                            <button class="btn btn-primary btn-sm" onclick="document.getElementById('file-${pieceId}').click();">📤 Importer</button>
+                            ${fileName ? `<button class="btn btn-danger btn-sm" onclick="demandeManager.deletePieceFile('${demandeId}', '${pieceId}');">🗑️ Supprimer</button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        // FONCTION 4: Gérer l'upload du fichier
+        demandeManager.handleFileUpload = async function(demandeId, pieceId, fileInput) {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('idDemande', demandeId);
+                formData.append('idPiece', pieceId);
+
+                // Appel API pour uploader le fichier
+                const response = await fetch('/check-pieces/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors de l\'upload');
+                }
+
+                const result = await response.json();
+                utils.showAlert('Fichier uploadé avec succès', 'success');
+
+                // Recharger les pièces
+                this.loadAndDisplayPieces(demandeId);
+
+            } catch (error) {
+                console.error('Erreur upload:', error);
+                utils.showAlert('Erreur lors de l\'upload du fichier', 'danger');
+            }
+
+            // Réinitialiser l'input
+            fileInput.value = '';
+        };
+
+        // FONCTION 5: Supprimer un fichier de pièce
+        demandeManager.deletePieceFile = async function(demandeId, pieceId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')) return;
+
+            try {
+                await fetch(`/check-pieces/${demandeId}/${pieceId}`, {
+                    method: 'DELETE'
+                });
+
+                utils.showAlert('Fichier supprimé avec succès', 'success');
+                this.loadAndDisplayPieces(demandeId);
+
+            } catch (error) {
+                console.error('Erreur suppression:', error);
+                utils.showAlert('Erreur lors de la suppression du fichier', 'danger');
+            }
+        };
+
+        // FONCTION 6: Vérifier la complétude du dossier
+        demandeManager.checkDossierComplet = function(demandeId, checkPieces) {
+            // Récupérer les pièces obligatoires
+            const obligatoires = checkPieces.filter(cp => cp.piece?.estObligatoire);
+            
+            // Vérifier si toutes les pièces obligatoires sont complètes
+            const completes = obligatoires.filter(cp => 
+                cp.estFourni && cp.fileName && cp.fileType
+            );
+
+            const pourcentage = obligatoires.length > 0 
+                ? Math.round((completes.length / obligatoires.length) * 100)
+                : 100;
+
+            // Mettre à jour l'affichage de progression
+            document.getElementById('completionProgress').style.width = pourcentage + '%';
+            document.getElementById('completionText').textContent = 
+                `${completes.length}/${obligatoires.length} pièces obligatoires complètes`;
+
+            const dossierComplet = completes.length === obligatoires.length && obligatoires.length > 0;
+
+            // Afficher le statut
+            const statusBadge = document.getElementById('dossierStatusBadge');
+            if (dossierComplet) {
+                statusBadge.innerHTML = '<span class="badge badge-success" style="background: #5cb85c; color: white; padding: 0.5rem 1rem; border-radius: 5px;">✅ COMPLET</span>';
+                document.getElementById('scanTermineBtn').style.display = 'inline-block';
+            } else {
+                statusBadge.innerHTML = '<span class="badge badge-warning" style="background: #f0ad4e; color: white; padding: 0.5rem 1rem; border-radius: 5px;">⏳ INCOMPLET</span>';
+                document.getElementById('scanTermineBtn').style.display = 'none';
+            }
+
+            // Stocker l'état pour la fonction marquerScanTermine
+            this.currentDemandeId = demandeId;
+            this.currentCheckPieces = checkPieces;
+        };
+
+        // FONCTION 7: Marquer le dossier comme "SCAN TERMINÉ"
+        demandeManager.marquerScanTermine = async function() {
+            const demandeId = this.currentDemandeId;
+
+            if (!demandeId) {
+                utils.showAlert('Erreur: ID demande introuvable', 'danger');
+                return;
+            }
+
+            try {
+                // Appeler l'API pour enregistrer le statut SCAN_TERMINE
+                const response = await fetch(`/demandes/${demandeId}/mark-scan-termine`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        idStatut: 'SCAN_TERMINE',
+                        date: new Date().toISOString().split('T')[0]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la validation');
+                }
+
+                utils.showAlert('✅ Dossier marqué comme SCAN TERMINÉ', 'success');
+                this.closePiecesModal();
+                this.loadDemandes();
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                utils.showAlert('Erreur lors de la validation du dossier', 'danger');
+            }
+        };
+
+        // FONCTION 8: Afficher le modal des pièces (modifiée pour le Sprint 3)
+        const originalViewPiecesJointes = demandeManager.viewPiecesJointes;
+        demandeManager.viewPiecesJointes = async function(demandeId) {
+            document.getElementById('piecesJointesModal').style.display = 'block';
+            await this.loadAndDisplayPieces(demandeId);
+        };
+
         // Ajouter les styles pour les badges
         const style = document.createElement('style');
         style.textContent = `
@@ -419,6 +684,77 @@
             .nav-links a.active {
                 background-color: rgba(255, 255, 255, 0.2);
                 border-radius: 5px;
+            }
+
+            /* SPRINT 3: Styles pour la gestion des pièces */
+            .modal-large {
+                max-width: 800px;
+                width: 90%;
+            }
+
+            .modal-body {
+                max-height: 70vh;
+                overflow-y: auto;
+                padding: 2rem;
+            }
+
+            .status-indicator {
+                background: #f5f5f5;
+                padding: 1.5rem;
+                border-radius: 10px;
+                border-left: 4px solid #007bff;
+            }
+
+            .progress-bar {
+                width: 100%;
+                height: 25px;
+                background: #e9ecef;
+                border-radius: 5px;
+                overflow: hidden;
+                margin: 1rem 0;
+            }
+
+            .progress-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #5cb85c 0%, #5cb85c 100%);
+                transition: width 0.3s ease;
+            }
+
+            .pieces-list {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .piece-row {
+                background: white;
+                border: 1px solid #ddd !important;
+                padding: 1rem !important;
+                border-radius: 5px;
+                transition: all 0.3s ease;
+            }
+
+            .piece-row:hover {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+
+            .piece-row.status-complete {
+                border-left: 4px solid #5cb85c !important;
+                background: #f0f8f4;
+            }
+
+            .piece-row.status-incomplete {
+                border-left: 4px solid #d9534f !important;
+                background: #fef5f5;
+            }
+
+            .file-input {
+                display: none;
+            }
+
+            .btn-sm {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
             }
             
             @media (max-width: 768px) {
