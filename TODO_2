@@ -1,0 +1,249 @@
+# PROJET : SYSTÈME DE GESTION DE VISA
+
+## INTRODUCTION
+
+Ce document réorganise et explique les tâches (TODO) du projet en les structurant clairement par sprint (1, 2 et 3).
+L’objectif est de comprendre les fonctionnalités à développer étape par étape.
+
+---
+
+## CONCEPTS PRINCIPAUX
+
+1. TYPES DE VISA
+
+* Visa transformable : peut évoluer vers une carte de résidence
+  Exemples :
+
+  * Étudiant
+  * Travailleur
+  * Missionnaire
+
+* Visa non transformable : reste tel quel (non concerné par transformation)
+
+---
+
+## SPRINT 1 : CRÉATION ET SAISIE DES DEMANDES
+
+OBJECTIF :
+Mettre en place la base du système pour saisir les demandes de visa et gérer les visas transformables.
+
+FONCTIONNALITÉS PRINCIPALES :
+
+1. ÉCRAN DE SAISIE
+
+* Formulaire pour créer :
+
+  * Un nouveau titre (nouveau visa)
+  * Un duplicata (en cas de perte)
+
+2. DEMANDE DE VISA
+
+* Création d’une nouvelle demande de visa
+* L’utilisateur saisit :
+
+  * Informations personnelles (état civil)
+  * Informations du visa
+  * Type de visa demandé (étudiant, travailleur, etc.)
+  * Catégorie de demande
+
+3. VISA TRANSFORMABLE
+
+* Le visa transformable doit être saisi AVANT la fin du visa normal
+* Condition métier :
+  → L’usager doit faire la demande avant expiration du visa actuel
+
+4. PIÈCES JUSTIFICATIVES
+
+* Liste des documents dépend du type de visa
+* Certaines pièces sont obligatoires
+
+5. CRUD À IMPLÉMENTER
+
+* Table "visa"
+
+  * titre simple
+  * duplicata
+
+* Table "visa_transformable"
+
+  * étudiant
+  * travailleur
+
+6. RÉSULTAT FINAL (OUTPUT)
+
+* Génération de :
+
+  * Carte de résident
+  * Visa
+
+→ Les deux contiennent les mêmes informations
+→ Documents imprimables
+
+7. CAS DE PERTE
+
+* Possibilité de demander :
+
+  * Duplicata carte résident
+  * Duplicata visa
+
+---
+
+## SPRINT 2 : GESTION DES ANTÉCÉDENTS
+
+OBJECTIF :
+Gérer les cas où les données existent déjà ou non dans le système.
+
+USER STORY :
+Un opérateur doit pouvoir traiter :
+
+* Duplicata
+* Transfert
+  Même si l’usager n’existe pas encore en base.
+
+---
+
+CAS 1 : DONNÉES DÉJÀ EXISTANTES
+
+* Recherche par :
+
+  * Numéro de passeport
+  * Numéro de demande
+
+* Le système récupère automatiquement :
+
+  * Informations personnelles
+  * Historique du visa
+
+UTILISATION :
+
+* Duplicata → perte de carte
+* Transfert → changement de passeport
+
+---
+
+CAS 2 : DONNÉES ABSENTES
+
+Problème :
+
+* L’usager possède un visa valide
+* MAIS n’est pas enregistré dans le système
+
+SOLUTION :
+
+1. Créer une demande spéciale :
+
+   * Type : "Nouveau Titre"
+   * Statut : immédiatement "VISA APPROUVÉ"
+
+→ Cela permet d’injecter ses données dans la base
+
+2. En parallèle :
+
+* Créer une demande :
+
+  * Duplicata OU
+  * Transfert
+
+---
+
+ÉDITION / SORTIE
+
+* Génération d’un document PDF :
+  "Attestation récépissé dossier"
+
+Contenu :
+
+* État civil
+* Informations passeport
+* Informations visa
+* Liste des pièces fournies
+
+---
+
+TABLES CONCERNÉES
+
+* visa_transformable
+* visa
+* carte_residence
+* demande
+* statut
+
+---
+
+## SPRINT 3 : NUMÉRISATION ET VERROUILLAGE
+
+OBJECTIF :
+Gérer les fichiers (scan) et sécuriser les dossiers.
+
+USER STORY :
+L’opérateur doit :
+
+* Uploader les pièces justificatives
+* Finaliser définitivement le dossier
+
+---
+
+1. NUMÉRISATION DES DOCUMENTS
+
+* Chaque pièce justificative doit avoir :
+
+  * Un fichier (image ou PDF)
+
+* Association :
+  pièce → fichier
+
+---
+
+2. CONTRÔLE DE COMPLÉTUDE (DOSSIER FENO)
+
+* Le bouton "Scan Terminé" est BLOQUÉ tant que :
+  → Toutes les pièces obligatoires n’ont pas de fichier
+
+---
+
+3. VERROUILLAGE FINAL
+
+Quand l’opérateur clique sur "Scan Terminé" :
+
+* Le statut devient :
+  → SCAN TERMINÉ
+
+* Conséquence :
+  → AUCUNE modification possible sur :
+
+  * Demande
+  * Informations personnelles
+  * Passeport
+
+---
+
+DONNÉES UTILISÉES
+
+* Gestion des fichiers :
+
+  * Chemin de stockage des fichiers
+
+---
+
+TABLES CONCERNÉES
+
+* piece_fournie
+* piece_type
+* statut
+
+---
+
+## RÉSUMÉ GLOBAL
+
+Sprint 1 :
+→ Création des demandes et saisie des visas
+
+Sprint 2 :
+→ Gestion des cas complexes (duplicata, transfert, données absentes)
+
+Sprint 3 :
+→ Upload des documents + verrouillage final
+
+---
+
+FIN DU DOCUMENT
