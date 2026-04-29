@@ -394,7 +394,7 @@
                 formData.append('idDemande', demandeId);
 
                 // Appel API pour uploader le fichier
-                const response = await fetch('/demandes/' + demandeId + '/upload-fichier', {
+                const response = await fetch('/visa-backoffice/api/demandes/' + demandeId + '/upload-fichier', {
                     method: 'POST',
                     body: formData
                 });
@@ -425,7 +425,7 @@
 
             try {
                 // Appel API pour marquer comme SCAN TERMINÉ
-                const response = await fetch('/demandes/' + demandeId + '/terminer-scan', {
+                const response = await fetch('/visa-backoffice/api/demandes/' + demandeId + '/terminer-scan', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -436,18 +436,20 @@
                     })
                 });
 
+                const result = await response.json();
+
                 if (!response.ok) {
-                    throw new Error('Erreur lors du verrouillage');
+                    throw new Error(result.error || 'Erreur lors du verrouillage');
                 }
 
                 utils.showAlert('✅ Demande verrouillée (SCAN TERMINÉ)', 'success');
                 
-                // Recharger les demandes
-                demandeManager.loadDemandes();
+                // Recharger les demandes pour mettre à jour l'affichage
+                await demandeManager.loadDemandes();
 
             } catch (error) {
                 console.error('Erreur verrouillage:', error);
-                utils.showAlert('❌ Erreur lors du verrouillage de la demande', 'danger');
+                utils.showAlert('❌ ' + error.message, 'danger');
             }
         };
 

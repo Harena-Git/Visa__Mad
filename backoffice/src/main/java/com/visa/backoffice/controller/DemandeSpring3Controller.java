@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,7 +38,7 @@ import com.visa.backoffice.repository.StatutRepository;
  * - Verrouillage des demandes (TERMINER SCANN)
  */
 @RestController
-@RequestMapping("/demandes")
+@RequestMapping("/api/demandes")
 @CrossOrigin(origins = "*")
 public class DemandeSpring3Controller {
 
@@ -56,6 +57,33 @@ public class DemandeSpring3Controller {
     // Répertoire de stockage des fichiers
     private static final String UPLOAD_DIR = "uploads/demandes/";
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+
+    /**
+     * Vérifier si une demande est verrouillée
+     * GET /demandes/{demandeId}/is-verrouille
+     * 
+     * @param demandeId ID de la demande
+     * @return { "verrouille": true/false }
+     */
+    @GetMapping("/{demandeId}/is-verrouille")
+    public ResponseEntity<?> isVerrouille(@PathVariable String demandeId) {
+        try {
+            Optional<Demande> demandeOpt = demandeRepository.findById(demandeId);
+            if (!demandeOpt.isPresent()) {
+                return ResponseEntity.badRequest().body(
+                    Map.of("verrouille", false));
+            }
+
+            boolean verrouille = isDemandeVerrouille(demandeOpt.get());
+            return ResponseEntity.ok(Map.of(
+                "verrouille", verrouille,
+                "demandeId", demandeId
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.ok(Map.of("verrouille", false));
+        }
+    }
 
     /**
      * Endpoint 1: Upload d'un fichier pour une demande
@@ -190,13 +218,17 @@ public class DemandeSpring3Controller {
                     Map.of("success", false, "error", "Paramètres manquants: idStatut et date requis"));
             }
 
-            // 5. Vérifier que le statut existe
+            // 5. Vérifier que le statut existe (sinon, créer un enregistrement avec le statut par défaut)
+            Statut statut = null;
             Optional<Statut> statutOpt = statutRepository.findById(idStatut);
-            if (!statutOpt.isPresent()) {
-                // Si le statut exact n'existe pas, le créer avec label par défaut
-                // Ou retourner une erreur
+            if (statutOpt.isPresent()) {
+                statut = statutOpt.get();
+            } else {
+                // Le statut n'existe pas - le créer ou retourner erreur
+                System.out.println("⚠️ Statut '" + idStatut + "' non trouvé en base. Vérifiez que les statuts sont créés.");
                 return ResponseEntity.badRequest().body(
-                    Map.of("success", false, "error", "Statut non trouvé: " + idStatut));
+                    Map.of("success", false, "error", 
+                        "Statut '" + idStatut + "' non trouvé. Assurez-vous qu'il existe en base de données"));
             }
 
             // 6. Créer un nouvel enregistrement StatutDemande
@@ -204,13 +236,15 @@ public class DemandeSpring3Controller {
             statutDemande.setId(UUID.randomUUID().toString());
             statutDemande.setDate(LocalDate.parse(dateStr));
             statutDemande.setDemande(demande);
-            statutDemande.setStatut(statutOpt.get());
+            statutDemande.setStatut(statut);
 
             statutDemandeRepository.save(statutDemande);
 
             // 7. Mettre à jour la demande (updated_at)
             demande.setUpdatedAt(LocalDate.now());
             demandeRepository.save(demande);
+
+            System.out.println("✅ Demande " + demandeId + " verrouillée avec le statut " + idStatut);
 
             // 8. Retourner succès
             return ResponseEntity.ok(Map.of(
@@ -219,6 +253,7 @@ public class DemandeSpring3Controller {
             ));
 
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 Map.of("success", false, "error", "Erreur serveur: " + e.getMessage()));
         }
