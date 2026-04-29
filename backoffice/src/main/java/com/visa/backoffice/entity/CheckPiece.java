@@ -23,6 +23,7 @@ public class CheckPiece {
     @Column(name = "updated_at")
     private LocalDate updatedAt;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_demande", referencedColumnName = "id_demande", insertable = false, updatable = false)
     private Demande demande;

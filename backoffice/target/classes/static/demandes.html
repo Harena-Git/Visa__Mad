@@ -679,10 +679,9 @@
         `;
         document.head.appendChild(style);
 
-        // Charger les données au chargement de la page
+        // Charger les statistiques au chargement de la page
+        // Note: loadReferenceData() et loadDemandes() sont déjà appelés par app.js
         document.addEventListener('DOMContentLoaded', function() {
-            demandeManager.loadReferenceData();
-            demandeManager.loadDemandes();
             demandeManager.loadStats();
         });
 
