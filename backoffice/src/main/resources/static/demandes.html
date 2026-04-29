@@ -245,18 +245,38 @@
                 const row = document.createElement('tr');
                 const statutBadge = this.getStatutBadge(demande);
                 
-                // Vérifier si la demande est verrouillée (SCAN_TERMINE)
-                const isVerrouille = demande.statutDemande === 'SCAN_TERMINE' || demande.locked === true;
+                // ⭐ Vérifier si la demande est verrouillée (SCAN_TERMINE)
+                // Vérifier dans les statuts de la demande
+                const isVerrouille = demande.statutDemandes && 
+                    demande.statutDemandes.some(s => s.statut && s.statut.id === 'SCAN_TERMINE');
                 
-                // État des boutons
+                // ⭐ Vérifier si la demande a déjà un fichier uploadé
+                const hasFile = demande.checkPieces && 
+                    demande.checkPieces.some(cp => cp.fileName !== null && cp.fileName !== undefined && cp.fileName.trim() !== '');
+                
+                // ========== BOUTON MODIFIER ==========
                 const modifierDisabled = isVerrouille ? 'disabled' : '';
                 const modifierClass = isVerrouille ? 'btn-secondary' : 'btn-warning';
                 const modifierTitle = isVerrouille ? 'Demande verrouillée (non modifiable)' : '';
                 
-                // Bouton TERMINER SCANN disabled si déjà verrouillé
-                const scanTermineDisabled = isVerrouille ? 'disabled' : '';
-                const scanTermineClass = isVerrouille ? 'btn-secondary' : 'btn-success';
-                const scanTermineTitle = isVerrouille ? 'Déjà verrouillée' : '';
+                // ========== BOUTON SUPPRIMER ==========
+                // Toujours actif
+                const supprimerDisabled = '';
+                const supprimerClass = 'btn-danger';
+                
+                // ========== BOUTON IMPORTER ==========
+                // Désactivé si demande verrouillée OU si fichier existe déjà
+                const importerDisabled = (isVerrouille || hasFile) ? 'disabled' : '';
+                const importerClass = (isVerrouille || hasFile) ? 'btn-secondary' : 'btn-info';
+                const importerTitle = isVerrouille ? 'Demande verrouillée' : 
+                                     hasFile ? 'Un fichier est déjà uploadé' : 'Importer un fichier pour cette demande';
+                
+                // ========== BOUTON TERMINER SCANN ==========
+                // Désactivé si demande verrouillée OU si pas de fichier
+                const scanTermineDisabled = (isVerrouille || !hasFile) ? 'disabled' : '';
+                const scanTermineClass = (isVerrouille || !hasFile) ? 'btn-secondary' : 'btn-success';
+                const scanTermineTitle = isVerrouille ? 'Déjà verrouillée' : 
+                                        !hasFile ? 'Importez un fichier d\'abord' : '';
                 
                 row.innerHTML = `
                     <td>${demande.id || ''}</td>
@@ -269,12 +289,12 @@
                     <td>
                         <div class="action-buttons">
                             <button class="btn ${modifierClass} btn-sm" onclick="demandeManager.editDemande('${demande.id}')" ${modifierDisabled} title="${modifierTitle}">✏️ Modifier</button>
-                            <button class="btn btn-danger btn-sm" onclick="demandeManager.deleteDemande('${demande.id}')">🗑️ Supprimer</button>
+                            <button class="btn ${supprimerClass} btn-sm" onclick="demandeManager.deleteDemande('${demande.id}')" ${supprimerDisabled} title="Supprimer cette demande">🗑️ Supprimer</button>
                         </div>
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn btn-info btn-sm" onclick="demandeManager.uploadFileDemande('${demande.id}')" title="Importer un fichier pour cette demande">📤 Importer</button>
+                            <button class="btn ${importerClass} btn-sm" onclick="demandeManager.uploadFileDemande('${demande.id}')" ${importerDisabled} title="${importerTitle}">📤 Importer</button>
                             <button class="btn ${scanTermineClass} btn-sm" onclick="demandeManager.terminerScanDemande('${demande.id}')" ${scanTermineDisabled} title="${scanTermineTitle}">🔒 Terminer Scann</button>
                         </div>
                     </td>
@@ -374,6 +394,32 @@
         
         // FONCTION 1: Ouvrir dialogue d'upload fichier
         demandeManager.uploadFileDemande = function(demandeId) {
+            // Chercher la demande pour vérifier son état
+            const demande = demandeManager.allDemandes.find(d => d.id === demandeId);
+            
+            if (!demande) {
+                utils.showAlert('❌ Demande non trouvée', 'danger');
+                return;
+            }
+            
+            // Vérifier si déjà verrouillée
+            const isVerrouille = demande.statutDemandes && 
+                demande.statutDemandes.some(s => s.statut && s.statut.id === 'SCAN_TERMINE');
+            
+            if (isVerrouille) {
+                utils.showAlert('❌ Cette demande est verrouillée et ne peut pas être modifiée', 'danger');
+                return;
+            }
+            
+            // Vérifier si fichier existe déjà
+            const hasFile = demande.checkPieces && 
+                demande.checkPieces.some(cp => cp.fileName !== null && cp.fileName !== undefined && cp.fileName.trim() !== '');
+            
+            if (hasFile) {
+                utils.showAlert('⚠️ Un fichier est déjà uploadé pour cette demande', 'warning');
+                return;
+            }
+            
             // Stocker l'ID de la demande pour l'utiliser dans handleFileSelected
             demandeManager.currentDemandeIdForUpload = demandeId;
             // Déclencher le dialogue de sélection de fichier
@@ -419,6 +465,32 @@
 
         // FONCTION 3: Verrouiller la demande (TERMINER SCANN)
         demandeManager.terminerScanDemande = async function(demandeId) {
+            // Chercher la demande
+            const demande = demandeManager.allDemandes.find(d => d.id === demandeId);
+            
+            if (!demande) {
+                utils.showAlert('❌ Demande non trouvée', 'danger');
+                return;
+            }
+            
+            // Vérifier si déjà verrouillée
+            const isVerrouille = demande.statutDemandes && 
+                demande.statutDemandes.some(s => s.statut && s.statut.id === 'SCAN_TERMINE');
+            
+            if (isVerrouille) {
+                utils.showAlert('❌ Cette demande est déjà verrouillée', 'danger');
+                return;
+            }
+            
+            // Vérifier s'il y a un fichier
+            const hasFile = demande.checkPieces && 
+                demande.checkPieces.some(cp => cp.fileName !== null && cp.fileName !== undefined && cp.fileName.trim() !== '');
+            
+            if (!hasFile) {
+                utils.showAlert('❌ Impossible de verrouiller: aucun fichier n\'a été uploadé', 'danger');
+                return;
+            }
+            
             if (!confirm('Êtes-vous sûr de vouloir verrouiller cette demande ?\n\nElle ne sera plus modifiable.')) {
                 return;
             }
@@ -450,6 +522,60 @@
             } catch (error) {
                 console.error('Erreur verrouillage:', error);
                 utils.showAlert('❌ ' + error.message, 'danger');
+            }
+        };
+
+        // FONCTION 4: Éditer une demande
+        demandeManager.editDemande = function(demandeId) {
+            const demande = demandeManager.allDemandes.find(d => d.id === demandeId);
+            
+            if (!demande) {
+                utils.showAlert('❌ Demande non trouvée', 'danger');
+                return;
+            }
+            
+            // Vérifier si verrouillée
+            const isVerrouille = demande.statutDemandes && 
+                demande.statutDemandes.some(s => s.statut && s.statut.id === 'SCAN_TERMINE');
+            
+            if (isVerrouille) {
+                utils.showAlert('❌ Cette demande est verrouillée et ne peut pas être modifiée', 'danger');
+                return;
+            }
+            
+            // TODO: Implémenter la modification (afficher un formulaire modal)
+            utils.showAlert('⚠️ Fonction de modification à implémenter', 'warning');
+        };
+
+        // FONCTION 5: Supprimer une demande
+        demandeManager.deleteDemande = async function(demandeId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer cette demande ?\n\nCette action est irréversible.')) {
+                return;
+            }
+
+            try {
+                // Appel API pour supprimer
+                const response = await fetch('/visa-backoffice/api/demandes/' + demandeId, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || result.error || 'Erreur lors de la suppression');
+                }
+
+                utils.showAlert('✅ Demande supprimée avec succès', 'success');
+                
+                // Recharger les demandes
+                await demandeManager.loadDemandes();
+
+            } catch (error) {
+                console.error('Erreur suppression:', error);
+                utils.showAlert('❌ Erreur lors de la suppression: ' + error.message, 'danger');
             }
         };
 

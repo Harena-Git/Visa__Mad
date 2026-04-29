@@ -271,6 +271,8 @@ const demandeManager = {
     loadDemandes: async function() {
         try {
             const demandes = await utils.apiRequest('/demandes');
+            // Stocker les demandes pour utilisation dans les fonctions Sprint 3
+            this.allDemandes = demandes;
             this.displayDemandes(demandes);
         } catch (error) {
             utils.showAlert('Erreur lors du chargement des demandes', 'danger');
