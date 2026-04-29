@@ -44,3 +44,5 @@ Verrouillage définitif : Une fois que l'opérateur clique sur "Scan Terminé", 
 Données utilisées à l'écran :
 Gestion des fichiers : Liaison entre la pièce et le fichier uploadé (chemin de stockage).
 Tables concernées : piece,demande,check_piece
+
+Sprint 4 : QR code

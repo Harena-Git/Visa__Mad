@@ -2,6 +2,8 @@ package com.visa.backoffice.entity;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -25,6 +27,7 @@ public class CheckPiece {
     @JoinColumn(name = "id_demande", referencedColumnName = "id_demande", insertable = false, updatable = false)
     private Demande demande;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_piece", referencedColumnName = "id_piece", insertable = false, updatable = false)
     private Piece piece;
