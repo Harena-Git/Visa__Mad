@@ -561,9 +561,11 @@
                 document.getElementById('demandeur').value = demande.demandeur?.id || '';
                 
                 if (demande.createdAt) {
-                    document.getElementById('dateDemande').value = demande.createdAt;
+                    // The date input expects yyyy-MM-dd format
+                    document.getElementById('dateDemande').value = new Date(demande.createdAt).toISOString().split('T')[0];
                 }
-            }, 100);
+                document.getElementById('observations').value = demande.observations || '';
+            }, 100); // setTimeout to ensure dropdowns are populated
             
             modal.style.display = 'block';
         };

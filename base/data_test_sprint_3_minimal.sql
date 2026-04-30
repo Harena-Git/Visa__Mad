@@ -51,4 +51,16 @@ WHERE d.id_demande = 'DEM_REQ_TEST_001';
 
 -- Résultat attendu: 1 ligne avec DEM_REQ_TEST_001
 
+INSERT INTO demandeur (
+    id_demandeur, nom, prenom, nom_jeune_fille, dtn, 
+    adresse_mada, telephone, email, 
+    created_at, updated_at, 
+    id_nationalite, id_situation_famille
+) VALUES (
+    'DEM_TEST_002', 'Harena', 'Harena', NULL, '2003-04-13',
+    '123 Rue Andoram', '2034213', 'harena@test.com',
+    NOW(), NOW(),
+    'NAT_TEST', 'SF_TEST'
+) ON CONFLICT DO NOTHING;
+
 COMMIT;
