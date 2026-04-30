@@ -1,9 +1,19 @@
 package com.visa.backoffice.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "demande")
@@ -46,12 +56,10 @@ public class Demande {
     @OneToMany(mappedBy = "demande")
     private List<Visa> visas;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "demande")
+    @OneToMany(mappedBy = "demande", fetch = FetchType.EAGER)
     private List<StatutDemande> statutDemandes;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "demande")
+    @OneToMany(mappedBy = "demande", fetch = FetchType.EAGER)
     private List<CheckPiece> checkPieces;
 
     public Demande() {}

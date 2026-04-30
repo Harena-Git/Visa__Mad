@@ -1,0 +1,300 @@
+PROJET : SYSTÈME DE GESTION DE VISA
+TODO GLOBAL (VERSION CORRIGÉE & ALIGNÉE AU SCRIPT SQL)
+======================================================
+
+## OBJECTIF
+
+Développer une application de gestion de visas permettant :
+
+* la saisie des demandes
+* la gestion des visas transformables
+* le suivi des dossiers
+* la numérisation des pièces
+* la validation finale des dossiers
+
+---
+
+## CONCEPTS PRINCIPAUX
+
+1. TYPE DE VISA
+
+* Définis dans la table : type_visa
+* Valeurs utilisées :
+
+  * ETUDIANT
+  * TRAVAILLEUR
+
+2. PIÈCES JUSTIFICATIVES
+
+* Définies dans la table : piece
+* Liées au type de visa
+* Attribut clé :
+
+  * est_obligatoire (0 ou 1)
+
+3. SUIVI DES PIÈCES FOURNIES
+
+* Table : check_piece
+* Permet de savoir :
+
+  * si une pièce est fournie (est_fourni)
+  * quel fichier est associé (file_name, file_type)
+
+4. STATUT D’UNE DEMANDE
+
+* Table : statut + statut_demande
+* Permet de suivre :
+
+  * CRÉÉ
+  * SCAN TERMINÉ
+  * VISA APPROUVÉ
+
+---
+
+## SPRINT 1 : SAISIE DES DEMANDES ET VISAS
+
+OBJECTIF :
+Mettre en place la création complète d’un dossier de demande.
+
+FONCTIONNALITÉS :
+
+1. CRÉATION D’UN DEMANDEUR
+
+* Table : demandeur
+* Informations :
+
+  * nom, prénom, date de naissance
+  * nationalité (nationalite)
+  * situation familiale (situation_famille)
+
+2. SAISIE DU PASSEPORT
+
+* Table : passport
+* Lié au demandeur
+
+3. CRÉATION D’UNE DEMANDE
+
+* Table : demande
+* Contient :
+
+  * type de visa (type_visa)
+  * catégorie (categorie_demande)
+  * lien vers demandeur
+
+4. GESTION DES VISAS
+
+a) Visa normal
+
+* Table : visa
+
+b) Visa transformable
+
+* Table : visa_transformable
+* Doit être saisi AVANT expiration du visa normal
+
+5. INITIALISATION DES PIÈCES
+
+* Pour chaque demande :
+  → créer des lignes dans check_piece
+  → basées sur la table piece
+
+Exemple :
+
+* si 3 pièces obligatoires → 3 lignes dans check_piece
+
+6. CAS MÉTIERS
+
+* Nouveau visa
+* Duplicata (perte)
+* Transfert (changement passeport)
+
+7. SORTIE
+
+* Génération :
+
+  * visa
+  * carte_residence
+    → mêmes informations, documents imprimables
+
+---
+
+## SPRINT 2 : GESTION DES ANTÉCÉDENTS
+
+OBJECTIF :
+Gérer les dossiers existants ou absents dans la base.
+
+---
+
+CAS 1 : DONNÉES EXISTANTES
+
+Recherche :
+
+* par numéro de passeport (passport.numero)
+* ou par id_demande
+
+Action :
+
+* récupération automatique :
+
+  * demandeur
+  * visa
+  * historique
+
+Utilisation :
+
+* duplicata
+* transfert
+
+---
+
+CAS 2 : DONNÉES ABSENTES
+
+Problème :
+
+* l’usager possède un visa valide
+* mais n’existe pas en base
+
+SOLUTION :
+
+1. CRÉER UNE DEMANDE D’INJECTION
+
+* table : demande
+* categorie : "NOUVEAU"
+* statut : VISA APPROUVÉ
+
+2. AJOUTER LES DONNÉES :
+
+* demandeur
+* passport
+* visa_transformable (historique papier)
+
+3. CRÉER EN PARALLÈLE :
+
+* une demande :
+
+  * duplicata OU
+  * transfert
+
+---
+
+SORTIE
+
+* Génération d’un document :
+  "Attestation récépissé dossier"
+
+Contenu :
+
+* infos demandeur
+* passeport
+* visa
+* liste des pièces (check_piece)
+
+---
+
+TABLES UTILISÉES
+
+* demandeur
+* passport
+* demande
+* visa
+* visa_transformable
+* carte_residence
+* statut
+* statut_demande
+
+---
+
+## SPRINT 3 : NUMÉRISATION ET VERROUILLAGE
+
+OBJECTIF :
+Gérer les fichiers des pièces et verrouiller le dossier.
+
+---
+
+1. UPLOAD DES FICHIERS
+
+Table utilisée : check_piece
+
+Pour chaque pièce :
+
+* mettre à jour :
+
+  * est_fourni = TRUE
+  * file_name (nom du fichier)
+  * file_type (type MIME)
+
+Exemple :
+
+* passport.pdf
+* photo.jpg
+
+---
+
+2. CONTRÔLE DE COMPLÉTUDE
+
+Condition :
+Un dossier est COMPLET si :
+
+→ toutes les pièces obligatoires (piece.est_obligatoire = 1)
+sont :
+
+* est_fourni = TRUE
+* file_name NON NULL
+
+---
+
+3. BOUTON "SCAN TERMINÉ"
+
+Visible UNIQUEMENT si :
+→ dossier complet
+
+---
+
+4. VALIDATION FINALE
+
+Action :
+
+* insertion dans statut_demande :
+  → statut = SCAN_TERMINE
+
+---
+
+5. VERROUILLAGE
+
+Une fois SCAN TERMINÉ :
+
+* interdiction de modifier :
+
+  * demande
+  * demandeur
+  * passport
+  * check_piece
+
+(gestion côté backend)
+
+---
+
+TABLES UTILISÉES
+
+* check_piece
+* piece
+* demande
+* statut
+* statut_demande
+
+---
+
+## RÉSUMÉ GLOBAL
+
+Sprint 1 :
+→ Création complète d’un dossier
+
+Sprint 2 :
+→ Gestion des historiques (avec ou sans données)
+
+Sprint 3 :
+→ Upload des pièces + validation + verrouillage
+
+---
+
+FIN DU DOCUMENT

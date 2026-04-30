@@ -1,5 +1,6 @@
 package com.visa.backoffice.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -17,6 +18,7 @@ public class StatutDemande {
     @JoinColumn(name = "id_statut", referencedColumnName = "id_statut")
     private Statut statut;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_demande", referencedColumnName = "id_demande")
     private Demande demande;

@@ -453,4 +453,35 @@ public class AetherRouteExecutor {
         resp.getWriter().write("\nContenu : " + result);
     }
 
+    /**
+     * Vérifie si l'utilisateur a le rôle requis pour accéder à la méthode.
+     * Si la méthode n'est pas annotée avec @RoleAutoriser, l'accès est autorisé.
+     */
+    private static void checkRoleAuthorization(Method method, HttpServletRequest req) throws Exception {
+        if (!method.isAnnotationPresent(RoleAutoriser.class)) {
+            return; // Pas de restriction de rôle
+        }
+
+        RoleAutoriser roleAnnotation = method.getAnnotation(RoleAutoriser.class);
+        String[] requiredRoles = roleAnnotation.value();
+
+        HttpSession session = req.getSession(false);
+        if (session == null) {
+            throw new AetherUnauthorizedException("Aucune session trouvée", null, requiredRoles.length > 0 ? requiredRoles[0] : null);
+        }
+
+        String userRole = (String) session.getAttribute("userRole");
+        if (userRole == null) {
+            throw new AetherUnauthorizedException("Aucun rôle utilisateur trouvé en session", null, requiredRoles.length > 0 ? requiredRoles[0] : null);
+        }
+
+        for (String requiredRole : requiredRoles) {
+            if (userRole.equals(requiredRole)) {
+                return; // Rôle autorisé
+            }
+        }
+
+        throw new AetherUnauthorizedException("Rôle '" + userRole + "' non autorisé", userRole, requiredRoles.length > 0 ? requiredRoles[0] : null);
+    }
+
 }

@@ -1,0 +1,5 @@
+# Created at 2026-04-20T15:08:33.286
+Boot Manifest-JAR contains absolute paths in classpath 'D:\Cours\Framework_Mr_Naina\Visa__Mad\aetheris\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+

@@ -5,6 +5,7 @@ Visa transformable :
     - etudiant, missionaire, travailleur ...
 
 Sprint 1 :
+Ecran de saisie : nouveaux titre simple, nouveaux duplicata
 L'application doit saisir le visa transformable
 Nouvelle demande de visa
 Avant la fin du visa normal, il doit faire un demande de visa transformable
@@ -14,5 +15,34 @@ Fiche de renseignement -> Etat Civil -> Information du visa transformable -> Typ
 (type etudiant et travailleur)
 Misy koa ny type de demande
 
+CRUD attendus :
+- tables visa (titre simple, duplicata)
+- table visa_transformable (travailleur et etudiant) -> a saisir avant fin du visa normal
+
 Output farany -> Carte residant sy visa (mitovy ny information) == a imprimer
-Misy koa ny nouvelle demande de duplicate pour carte residant sy visa
+En cas de perte -> nouvelle demande de duplicata pour carte residant sy visa (anaty passport)
+
+Sprint 2 : Gestion des Antécédents (Duplicata & Transfert)
+User Story : "En tant qu'opérateur, je veux traiter les demandes de duplicata ou de transfert, même si l'usager n'est pas dans notre base."
+Scénarios Métiers :
+Cas Normal (Données présentes) : L'usager a déjà eu un visa via l'appli. S'il perd sa carte (Duplicata) ou change de passeport (Transfert), on saisit son numéro et le système récupère toutes ses infos automatiquement.
+Cas Problématique (Sans Données Antérieures) : L'usager a un titre valide (ex: jusqu'en 2030) mais n'a jamais été saisi dans le nouveau système.
+Action : On crée une demande de "Nouveau Titre" qui est immédiatement validée (Statut: VISA APPROUVÉ) pour injecter ses données actuelles en base.
+Simultanéité : En parallèle, on crée la demande de Duplicata ou de Transfert rattachée à cette injection de données.
+Édition : Impression du PDF "Attestation récépissé dossier" regroupant l'état civil, les infos passeport, visa et la liste des documents physiques reçus.
+Données utilisées à l'écran :
+Cas Normal : Recherche par numéro de passeport ou demande.
+Sans Données : Table visa_transformable pour renseigner l'historique papier (référence, date entrée).
+Tables concernées : visa_transformable, visa, carte_resident, demande, statut.
+
+Sprint 3 : Finalisation et Scan (Scan Terminé)
+User Story : "En tant qu'opérateur, je veux uploader les fichiers par pièce justificative et verrouiller le dossier."
+Scénarios Métiers :
+Numérisation : L'opérateur scanne les documents physiques. Chaque pièce justificative (obligatoire ou optionnelle cochée au Sprint 1) doit recevoir son fichier image/PDF.
+Contrôle de complétude (Dossier FENO) : Le bouton "Scan Terminé" reste masqué tant que TOUTES les pièces attendues n'ont pas de fichier rattaché.
+Verrouillage définitif : Une fois que l'opérateur clique sur "Scan Terminé", le statut passe de CRÉÉ à SCAN TERMINÉ. À cet instant, plus aucune modification n'est possible sur les infos de la demande, de l'individu ou du passeport.
+Données utilisées à l'écran :
+Gestion des fichiers : Liaison entre la pièce et le fichier uploadé (chemin de stockage).
+Tables concernées : piece,demande,check_piece
+
+Sprint 4 : QR code
