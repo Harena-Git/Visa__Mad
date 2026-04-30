@@ -539,12 +539,33 @@
                 demande.statutDemandes.some(s => s.statut && s.statut.id === 'SCAN_TERMINE');
             
             if (isVerrouille) {
-                utils.showAlert('❌ Cette demande est verrouillée et ne peut pas être modifiée', 'danger');
+                utils.showAlert('❌ Cette demande est verrouillée (SCAN TERMINÉ) et ne peut pas être modifiée', 'danger');
                 return;
             }
             
-            // TODO: Implémenter la modification (afficher un formulaire modal)
-            utils.showAlert('⚠️ Fonction de modification à implémenter', 'warning');
+            // Ouvrir le formulaire en mode édition
+            const modal = document.getElementById('demandeModal');
+            const form = document.getElementById('demandeForm');
+            const title = document.getElementById('modalTitle');
+            
+            if (!modal || !form) return;
+            
+            form.reset();
+            title.textContent = 'Modifier la Demande #' + demandeId;
+            form.dataset.id = demandeId;
+            
+            // Pré-remplir les champs avec les données existantes
+            setTimeout(() => {
+                document.getElementById('categorie').value = demande.categorie?.id || '';
+                document.getElementById('typeVisa').value = demande.typeVisa?.id || '';
+                document.getElementById('demandeur').value = demande.demandeur?.id || '';
+                
+                if (demande.createdAt) {
+                    document.getElementById('dateDemande').value = demande.createdAt;
+                }
+            }, 100);
+            
+            modal.style.display = 'block';
         };
 
         // FONCTION 5: Supprimer une demande
