@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Demandes de Visa</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        .tracking-container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .tracking-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            border-bottom-color: #0066cc;
+            color: #0066cc;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .search-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 5px rgba(0,102,204,0.3);
+        }
+
+        .btn-search {
+            background-color: #0066cc;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-search:hover {
+            background-color: #0052a3;
+        }
+
+        .btn-search:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .results-container {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results-container.show {
+            display: block;
+        }
+
+        .demande-card {
+            background: #f9f9f9;
+            border-left: 4px solid #0066cc;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .demande-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .demande-id {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-badge.created {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-badge.in-progress {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-badge.completed {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-badge.rejected {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        .demande-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .timeline {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .timeline-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-left: 15px;
+            border-left: 2px solid #0066cc;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -9px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #0066cc;
+            border: 3px solid white;
+            box-shadow: 0 0 0 1px #0066cc;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-date {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 3px;
+        }
+
+        .timeline-status {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .error-message {
+            background-color: #ffebee;
+            color: #d32f2f;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background-color: #e8f5e9;
+            color: #388e3c;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0066cc;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .qr-instruction {
+            background-color: #e3f2fd;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #1565c0;
+        }
+
+        .info-grid-single {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .qr-code-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .qr-code-image {
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            border: 2px solid #0066cc;
+            border-radius: 4px;
+            padding: 10px;
+            background: white;
+        }
+
+        .qr-code-info {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .token-display {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 4px;
+            word-break: break-all;
+            font-family: monospace;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .copy-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .copy-btn:hover {
+            background-color: #45a049;
+        }
+
+        .token-label {
+            font-weight: 500;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .generation-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .demande-info,
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tracking-card {
+                padding: 20px;
+            }
+
+            .tracking-container {
+                margin: 10px;
+                padding: 10px;
+            }
+
+            .tab-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>
+            🏛️ Ministère des Visas
+            <span style="font-size: 0.6rem; opacity: 0.8;">Suivi des Demandes</span>
+        </h1>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">🏠 Accueil</a></li>
+                <li><a href="tracking.html" class="active">📍 Suivi des Demandes</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="tracking-container">
+            <!-- Hero Section -->
+            <div class="tracking-card">
+                <h1 style="text-align: center; color: #333; margin-bottom: 20px;">
+                    Consultez le statut de votre demande de visa
+                </h1>
+                <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                    Entrez votre numéro de passeport ou le numéro de votre demande pour suivre votre dossier en temps réel.
+                </p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tracking-card">
+                <div class="tabs">
+                    <button class="tab-button active" onclick="switchTab('passport')">
+                        🛂 Par Numéro de Passeport
+                    </button>
+                    <button class="tab-button" onclick="switchTab('token')">
+                        🔗 Par Lien / Code
+                    </button>
+                    <button class="tab-button" onclick="switchTab('generate')">
+                        🎯 Générer un Lien
+                    </button>
+                </div>
+
+                <!-- Tab 1: Recherche par Passeport -->
+                <div id="passport-tab" class="tab-content active">
+                    <div class="search-form">
+                        <div class="form-group">
+                            <label for="passportNumber">Numéro de Passeport *</label>
+                            <input 
+                                type="text" 
+                                id="passportNumber" 
+                                placeholder="Ex: PAD123456789"
+                                onkeypress="handleEnter(event, 'passport')"
+                            >
+                        </div>
+                        <button class="btn-search" onclick="searchByPassport()">
+                            🔍 Rechercher mes Demandes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Suivi par Token -->
+                <div id="token-tab" class="tab-content">
+                    <div class="qr-instruction">
+                        📱 Vous avez reçu un QR code ? Scannez-le ou collez le code de suivi ci-dessous.
+                    </div>
+                    <div class="search-form">
+                        <div class="form-group">
+                            <label for="trackingToken">Code de Suivi ou Lien *</label>
+                            <input 
+                                type="text" 
+                                id="trackingToken" 
+                                placeholder="Collez le code unique de suivi reçu"
+                                onkeypress="handleEnter(event, 'token')"
+                            >
+                        </div>
+                        <button class="btn-search" onclick="searchByToken()">
+                            🔗 Accéder à mon Suivi
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Générer un Lien de Suivi -->
+                <div id="generate-tab" class="tab-content">
+                    <div class="qr-instruction">
+                        🔑 Entrez le numéro de votre demande pour générer un lien de suivi unique avec QR code.
+                    </div>
+                    <div class="generation-form">
+                        <div class="form-group">
+                            <label for="demandeIdInput">Numéro de Demande *</label>
+                            <input 
+                                type="text" 
+                                id="demandeIdInput" 
+                                placeholder="Ex: REQ-SPRINT4-001"
+                                onkeypress="handleEnter(event, 'generate')"
+                            >
+                        </div>
+                        <button class="btn-search" onclick="generateTrackingLink()">
+                            🎯 Générer le Lien de Suivi
+                        </button>
+                    </div>
+                    <div id="generationResult" style="display: none; margin-top: 20px;">
+                        <h3 style="color: #333; margin-bottom: 15px;">✅ Lien généré avec succès</h3>
+                        <div class="token-label">Code de Suivi Unique :</div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="text" id="generatedToken" readonly style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace;">
+                            <button class="copy-btn" onclick="copyToClipboard('generatedToken')">📋 Copier</button>
+                        </div>
+                        <div class="token-label" style="margin-top: 20px;">URL de Suivi Complète :</div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="text" id="generatedUrl" readonly style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 12px;">
+                            <button class="copy-btn" onclick="copyToClipboard('generatedUrl')">📋 Copier</button>
+                        </div>
+                        <div class="qr-code-container">
+                            <div class="qr-code-info">📲 Code QR pour partager</div>
+                            <img id="generatedQRCode" src="" alt="QR Code" class="qr-code-image">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages d'erreur et de succès -->
+                <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="success-message"></div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Chargement en cours...</p>
+            </div>
+
+            <!-- Résultats -->
+            <div id="resultsContainer" class="results-container">
+                <div id="resultsList"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 20px; color: #666; border-top: 1px solid #f0f0f0; margin-top: 30px;">
+        <p>&copy; 2026 Ministère des Visas. Tous droits réservés.</p>
+        <p style="font-size: 12px; margin-top: 10px;">
+            Pour toute assistance, contactez le support : <a href="tel:+261" style="color: #0066cc;">Support Client</a>
+        </p>
+    </footer>
+
+    <script>
+        const API_BASE_URL = '/visa-backoffice/api/public/tracking';
+
+        // Changer l'onglet
+        function switchTab(tabName) {
+            // Masquer tous les onglets
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Afficher l'onglet actif
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+
+            // Réinitialiser les messages
+            hideMessages();
+            hideResults();
+        }
+
+        // Gérer la touche Entrée
+        function handleEnter(event, type) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                if (type === 'passport') {
+                    searchByPassport();
+                } else {
+                    searchByToken();
+                }
+            }
+        }
+
+        // Rechercher par numéro de passeport
+        async function searchByPassport() {
+            const passportNumber = document.getElementById('passportNumber').value.trim();
+
+            if (!passportNumber) {
+                showError('Veuillez entrer un numéro de passeport');
+                return;
+            }
+
+            await performSearch(
+                `${API_BASE_URL}/passport/${encodeURIComponent(passportNumber)}`,
+                'passport'
+            );
+        }
+
+        // Rechercher par token de suivi
+        async function searchByToken() {
+            let trackingInput = document.getElementById('trackingToken').value.trim();
+
+            if (!trackingInput) {
+                showError('Veuillez entrer un code de suivi');
+                return;
+            }
+
+            let token = trackingInput;
+            
+            // Si c'est une URL ou contient des paramètres, extraire le token
+            if (trackingInput.includes('?token=')) {
+                // Chercher le paramètre token=VALUE dans l'URL
+                const match = trackingInput.match(/[?&]token=([^&]*)/);
+                if (match && match[1]) {
+                    token = match[1];
+                    console.log('Token extrait de l\'URL:', token);
+                } else {
+                    showError('URL invalide : paramètre "token" non trouvé');
+                    return;
+                }
+            } else if (trackingInput.includes('?')) {
+                // Une URL mais pas avec notre paramètre token attendu
+                showError('URL invalide : paramètre "token" attendu');
+                return;
+            }
+            // Sinon, c'est un token simple
+
+            console.log('Recherche avec token:', token);
+            await performSearch(
+                `${API_BASE_URL}/token/${encodeURIComponent(token)}`,
+                'token'
+            );
+        }
+
+        // Effectuer la recherche
+        async function performSearch(url, type) {
+            showLoading();
+            hideMessages();
+            hideResults();
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                hideLoading();
+
+                // Vérifier si on a les données attendues
+                if (response.ok) {
+                    if (type === 'passport' && data.demandes) {
+                        displayPassportResults(data.demandes);
+                        showSuccess('Demandes trouvées avec succès');
+                    } else if (type === 'token' && data.demandeId) {
+                        // Pour token, data est directement la demande
+                        displayTokenResult(data);
+                        showSuccess('Demande trouvée avec succès');
+                    } else {
+                        showError(data.error || 'Aucune demande trouvée');
+                    }
+                } else {
+                    showError(data.error || 'Aucune demande trouvée');
+                }
+            } catch (error) {
+                hideLoading();
+                console.error('Erreur:', error);
+                showError('Erreur lors de la recherche. Veuillez réessayer.');
+            }
+        }
+
+        // Afficher les résultats de recherche par passeport
+        function displayPassportResults(demandes) {
+            if (!demandes || demandes.length === 0) {
+                displayEmptyState();
+                return;
+            }
+
+            let html = '<h2 style="margin-bottom: 20px;">Vos demandes</h2>';
+
+            demandes.forEach(demande => {
+                html += generateDemandeCard(demande);
+            });
+
+            document.getElementById('resultsList').innerHTML = html;
+            showResults();
+        }
+
+        // Afficher le résultat de recherche par token
+        function displayTokenResult(demande) {
+            let html = `
+                <div style="background: #e8f5e9; color: #388e3c; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                    <strong>✅ Demande trouvée!</strong>
+                </div>
+                <div style="margin-top: 10px;">
+                    <p><strong>ID Demande:</strong> ${demande.demandeId || 'N/A'}</p>
+                    <p><strong>Demandeur:</strong> ${demande.demandeur?.prenom || ''} ${demande.demandeur?.nom || 'N/A'}</p>
+                    <p><strong>Type Visa:</strong> ${demande.typeVisa || 'N/A'}</p>
+                    <p><strong>Catégorie:</strong> ${demande.categorie || 'N/A'}</p>
+                    <p><strong>Statut Actuel:</strong> <span class="status-badge ${getStatusClass(demande.statutActuel)}">${demande.statutActuel}</span></p>
+                </div>
+            `;
+            
+            // Ajouter la timeline si elle existe
+            if (demande.historique && demande.historique.length > 0) {
+                html += generateTimeline(demande.historique);
+            }
+            
+            // Ajouter le QR code s'il existe
+            if (demande.qrCodeBase64) {
+                html += `
+                    <div class="qr-code-container">
+                        <div class="qr-code-info">📲 Code QR pour partage</div>
+                        <img src="data:image/png;base64,${demande.qrCodeBase64}" alt="QR Code" class="qr-code-image">
+                    </div>
+                `;
+            }
+
+            document.getElementById('resultsList').innerHTML = html;
+            showResults();
+        }
+        
+        // Générer la timeline des statuts
+        function generateTimeline(historique) {
+            let html = `
+                <div class="timeline" style="margin-top: 20px;">
+                    <div class="timeline-title">📋 Historique des Statuts</div>
+            `;
+            
+            historique.forEach(item => {
+                const dateStatut = formatDate(item.date);
+                html += `
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-date">${dateStatut}</div>
+                            <div class="timeline-status">${item.statut}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            return html;
+        }
+
+        // Générer une carte de demande
+        function generateDemandeCard(demande) {
+            const statutActuel = demande.statutActuel || 'Créée';
+            const statutBadge = getStatutBadge(statutActuel);
+            const dateCreation = formatDate(demande.dateCreation);
+            const dateMaj = formatDate(demande.dateMiseAJour);
+
+            let html = `
+                <div class="demande-card">
+                    <div class="demande-header">
+                        <div class="demande-id">${demande.demandeId || 'N/A'}</div>
+                        <div class="status-badge ${getStatusClass(statutActuel)}">
+                            ${statutActuel}
+                        </div>
+                    </div>
+
+                    <div class="demande-info">
+                        <div class="info-row">
+                            <span class="info-label">👤 Demandeur</span>
+                            <span class="info-value">
+                                ${demande.demandeur?.prenom || ''} ${demande.demandeur?.nom || 'N/A'}
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">🛂 Type de Visa</span>
+                            <span class="info-value">${demande.typeVisa || 'N/A'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">📂 Catégorie</span>
+                            <span class="info-value">${demande.categorie || 'N/A'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">📅 Date de Création</span>
+                            <span class="info-value">${dateCreation}</span>
+                        </div>
+                    </div>
+            `;
+
+            // Ajouter le QR code s'il existe
+            if (demande.qrCodeBase64) {
+                html += `
+                    <div class="qr-code-container">
+                        <div class="qr-code-info">📲 Code QR pour suivi rapide</div>
+                        <img src="data:image/png;base64,${demande.qrCodeBase64}" alt="QR Code" class="qr-code-image">
+                        <div class="qr-code-info">Token: ${demande.trackingToken || 'Non disponible'}</div>
+                    </div>
+                `;
+            }
+
+            // Ajouter la timeline des statuts
+            if (demande.historique && demande.historique.length > 0) {
+                html += `
+                    <div class="timeline">
+                        <div class="timeline-title">📋 Historique des Statuts</div>
+                `;
+
+                demande.historique.forEach(statut => {
+                    const dateStatut = formatDate(statut.date);
+                    html += `
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-date">${dateStatut}</div>
+                                <div class="timeline-status">${statut.statut}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+            }
+
+            html += '</div>';
+
+            return html;
+        }
+
+        // Obtenir le badge de statut
+        function getStatutBadge(statut) {
+            const statusMap = {
+                'CRÉÉE': '✅ Créée',
+                'SCAN_TERMINÉ': '📦 Scan Terminé',
+                'VISA_APPROUVÉ': '✨ Visa Approuvé',
+                'VISA_REJETÉ': '❌ Visa Rejeté',
+                'EN_COURS': '⏳ En Cours'
+            };
+
+            return statusMap[statut?.toUpperCase()] || statut || 'En Attente';
+        }
+
+        // Obtenir la classe CSS du statut
+        function getStatusClass(statut) {
+            const upper = statut?.toUpperCase() || '';
+
+            if (upper.includes('APPROUVÉ') || upper.includes('CRÉÉE')) {
+                return 'completed';
+            } else if (upper.includes('REJETÉ')) {
+                return 'rejected';
+            } else if (upper.includes('SCAN')) {
+                return 'in-progress';
+            }
+
+            return 'created';
+        }
+
+        // Formater la date
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Afficher état vide
+        function displayEmptyState() {
+            const html = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">🔍</div>
+                    <h3>Aucune demande trouvée</h3>
+                    <p>Aucune demande n'a été trouvée pour les critères de recherche.</p>
+                </div>
+            `;
+
+            document.getElementById('resultsList').innerHTML = html;
+            showResults();
+        }
+
+        // Afficher/masquer les messages
+        function showError(message) {
+            const elem = document.getElementById('errorMessage');
+            elem.textContent = '❌ ' + message;
+            elem.classList.add('show');
+        }
+
+        function showSuccess(message) {
+            const elem = document.getElementById('successMessage');
+            elem.textContent = '✅ ' + message;
+            elem.classList.add('show');
+            setTimeout(() => elem.classList.remove('show'), 3000);
+        }
+
+        function hideMessages() {
+            document.getElementById('errorMessage').classList.remove('show');
+            document.getElementById('successMessage').classList.remove('show');
+        }
+
+        function showLoading() {
+            document.getElementById('loading').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('show');
+        }
+
+        function showResults() {
+            document.getElementById('resultsContainer').classList.add('show');
+        }
+
+        function hideResults() {
+            document.getElementById('resultsContainer').classList.remove('show');
+        }
+
+        // Générer un lien de suivi avec QR code
+        async function generateTrackingLink() {
+            const demandeId = document.getElementById('demandeIdInput').value.trim();
+
+            if (!demandeId) {
+                showError('Veuillez entrer un numéro de demande');
+                return;
+            }
+
+            showLoading();
+            hideMessages();
+            document.getElementById('generationResult').style.display = 'none';
+
+            try {
+                const baseUrl = window.location.origin + '/visa-backoffice/tracking.html?token=';
+                const url = '/visa-backoffice/api/demandes/' + encodeURIComponent(demandeId) + '/generate-qr?baseUrl=' + encodeURIComponent(baseUrl);
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                hideLoading();
+
+                if (response.ok && data.success) {
+                    // Afficher les résultats
+                    document.getElementById('generatedToken').value = data.trackingToken;
+                    document.getElementById('generatedUrl').value = data.trackingUrl || (baseUrl + data.trackingToken);
+                    // Utiliser 'qrCode' qui contient déjà le préfixe 'data:image/png;base64,'
+                    document.getElementById('generatedQRCode').src = data.qrCode;
+                    document.getElementById('generationResult').style.display = 'block';
+                    showSuccess('Lien de suivi généré avec succès !');
+                    
+                    // Afficher dans la console pour verification
+                    console.log('Token généré:', data.trackingToken);
+                    console.log('URL de suivi:', data.trackingUrl || (baseUrl + data.trackingToken));
+                    
+                    // Effacer le champ d'entrée
+                    document.getElementById('demandeIdInput').value = '';
+                } else {
+                    showError(data.error || 'Erreur lors de la génération du lien');
+                }
+            } catch (error) {
+                hideLoading();
+                console.error('Erreur:', error);
+                showError('Erreur lors de la génération. Veuillez réessayer.');
+            }
+        }
+
+        // Copier dans le presse-papiers
+        function copyToClipboard(elementId) {
+            const elem = document.getElementById(elementId);
+            elem.select();
+            document.execCommand('copy');
+            
+            // Afficher une confirmation
+            const originalText = elem.value;
+            elem.value = '✅ Copié !';
+            setTimeout(() => {
+                elem.value = originalText;
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

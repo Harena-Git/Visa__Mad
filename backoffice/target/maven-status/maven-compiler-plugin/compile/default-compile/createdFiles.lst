@@ -27,6 +27,7 @@ com\visa\backoffice\config\TemporaryFixConfig.class
 com\visa\backoffice\entity\Nationalite.class
 com\visa\backoffice\controller\CheckPieceController.class
 com\visa\backoffice\repository\CategorieDemandeRepository.class
+com\visa\backoffice\controller\TrackingController.class
 com\visa\backoffice\repository\CarteResidenceRepository.class
 com\visa\backoffice\service\SituationFamilleService.class
 com\visa\backoffice\entity\CheckPiece.class
@@ -36,6 +37,7 @@ com\visa\backoffice\repository\DemandeRepository.class
 com\visa\backoffice\repository\TypeVisaRepository.class
 com\visa\backoffice\controller\PieceController.class
 com\visa\backoffice\entity\Statut.class
+com\visa\backoffice\service\QRCodeService.class
 com\visa\backoffice\service\PassportService.class
 com\visa\backoffice\entity\TypeVisa.class
 com\visa\backoffice\entity\Demandeur.class

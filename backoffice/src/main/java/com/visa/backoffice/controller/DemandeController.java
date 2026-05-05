@@ -38,6 +38,7 @@ import com.visa.backoffice.repository.PieceRepository;
 import com.visa.backoffice.repository.StatutDemandeRepository;
 import com.visa.backoffice.repository.StatutRepository;
 import com.visa.backoffice.service.DemandeService;
+import com.visa.backoffice.service.QRCodeService;
 
 @RestController
 @RequestMapping("/api/demandes")
@@ -46,6 +47,9 @@ public class DemandeController {
 
     @Autowired
     private DemandeService demandeService;
+    
+    @Autowired
+    private QRCodeService qrCodeService;
     
     @Autowired
     private CheckPieceRepository checkPieceRepository;
@@ -465,5 +469,103 @@ public class DemandeController {
         }
         
         return false;
+    }
+
+    /**
+     * Génère une tracking URL et un QR code pour une demande
+     * POST /api/demandes/{demandeId}/generate-qr
+     */
+    @PostMapping("/{demandeId}/generate-qr")
+    public ResponseEntity<?> generateQRCode(
+            @PathVariable String demandeId,
+            @RequestParam(defaultValue = "http://localhost:8080") String baseUrl) {
+        try {
+            Optional<Demande> demandeOpt = demandeService.findById(demandeId);
+            
+            if (!demandeOpt.isPresent()) {
+                return ResponseEntity.badRequest().body(
+                    Map.of("success", false, "error", "Demande non trouvée"));
+            }
+
+            Demande demande = demandeOpt.get();
+            
+            // Générer ou récupérer le tracking token
+            String trackingToken = demande.getTrackingToken();
+            if (trackingToken == null || trackingToken.isEmpty()) {
+                trackingToken = demandeService.generateTrackingToken(demandeId);
+                demande = demandeService.findById(demandeId).get(); // Rafraîchir
+            }
+
+            // Construire l'URL de suivi complète
+            String trackingUrl = demandeService.buildTrackingUrl(trackingToken, baseUrl);
+
+            // Générer le QR code en Base64
+            String qrCodeBase64 = qrCodeService.generateQRCodeBase64(trackingUrl, 400);
+
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "trackingToken", trackingToken,
+                "trackingUrl", trackingUrl,
+                "qrCode", "data:image/png;base64," + qrCodeBase64,
+                "demandeId", demandeId
+            ));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                Map.of("success", false, "error", "Erreur lors de la génération du QR code: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Récupère les informations de suivi d'une demande via le tracking token
+     * GET /api/demandes/tracking/{trackingToken}
+     */
+    @GetMapping("/tracking/{trackingToken}")
+    public ResponseEntity<?> getDemandeTracking(@PathVariable String trackingToken) {
+        try {
+            Optional<Demande> demandeOpt = demandeService.findByTrackingToken(trackingToken);
+            
+            if (!demandeOpt.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    Map.of("success", false, "error", "Demande non trouvée"));
+            }
+
+            Demande demande = demandeOpt.get();
+            
+            // Préparer les informations de suivi
+            Map<String, Object> trackingInfo = new HashMap<>();
+            trackingInfo.put("demandeId", demande.getId());
+            trackingInfo.put("demandeurNom", demande.getDemandeur() != null ? 
+                demande.getDemandeur().getNom() : "");
+            trackingInfo.put("demandeurPrenom", demande.getDemandeur() != null ? 
+                demande.getDemandeur().getPrenom() : "");
+            trackingInfo.put("typeVisa", demande.getTypeVisa() != null ? 
+                demande.getTypeVisa().getLibelle() : "");
+            trackingInfo.put("categorie", demande.getCategorie() != null ? 
+                demande.getCategorie().getLibelle() : "");
+            trackingInfo.put("createdAt", demande.getCreatedAt());
+            trackingInfo.put("updatedAt", demande.getUpdatedAt());
+            
+            // Ajouter les statuts de la demande
+            List<StatutDemande> statuts = statutDemandeRepository.findByDemandeId(demande.getId());
+            trackingInfo.put("statuts", statuts);
+            
+            // Déterminer l'état actuel
+            if (!statuts.isEmpty()) {
+                StatutDemande lastStatut = statuts.get(statuts.size() - 1);
+                trackingInfo.put("currentStatut", lastStatut.getStatut() != null ? 
+                    lastStatut.getStatut().getLibelle() : "N/A");
+            } else {
+                trackingInfo.put("currentStatut", "Créée");
+            }
+
+            return ResponseEntity.ok(trackingInfo);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                Map.of("success", false, "error", "Erreur serveur: " + e.getMessage()));
+        }
     }
 }
