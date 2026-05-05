@@ -62,6 +62,9 @@ public class Demande {
     @OneToMany(mappedBy = "demande", fetch = FetchType.EAGER)
     private List<CheckPiece> checkPieces;
 
+    @Column(name = "tracking_token", unique = true, nullable = true, length = 255)
+    private String trackingToken;
+
     public Demande() {}
 
     public String getId() {
@@ -159,5 +162,13 @@ public class Demande {
 
     public void setCheckPieces(List<CheckPiece> checkPieces) {
         this.checkPieces = checkPieces;
+    }
+
+    public String getTrackingToken() {
+        return trackingToken;
+    }
+
+    public void setTrackingToken(String trackingToken) {
+        this.trackingToken = trackingToken;
     }
 }

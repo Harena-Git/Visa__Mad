@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DemandeRepository extends JpaRepository<Demande, String> {
@@ -27,4 +28,6 @@ public interface DemandeRepository extends JpaRepository<Demande, String> {
     @org.springframework.data.jpa.repository.Query("SELECT d FROM Demande d WHERE d.demandeur.id IN " +
             "(SELECT p.demandeur.id FROM Passport p WHERE p.numero = :numero)")
     List<Demande> findByPassportNumero(@org.springframework.data.repository.query.Param("numero") String numero);
+
+    Optional<Demande> findByTrackingToken(String trackingToken);
 }

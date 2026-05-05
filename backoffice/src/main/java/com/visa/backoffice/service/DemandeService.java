@@ -101,4 +101,47 @@ public class DemandeService {
     public List<Demande> findByPassportNumero(String numero) {
         return demandeRepository.findByPassportNumero(numero);
     }
+
+    /**
+     * Génère un token unique de suivi pour une demande
+     */
+    public String generateTrackingToken(String demandeId) {
+        String trackingToken = UUID.randomUUID().toString();
+        Optional<Demande> demandeOpt = demandeRepository.findById(demandeId);
+        
+        if (demandeOpt.isPresent()) {
+            Demande demande = demandeOpt.get();
+            demande.setTrackingToken(trackingToken);
+            demandeRepository.save(demande);
+            return trackingToken;
+        }
+        
+        return null;
+    }
+
+    /**
+     * Récupère une demande par son token de suivi
+     */
+    public Optional<Demande> findByTrackingToken(String trackingToken) {
+        return demandeRepository.findByTrackingToken(trackingToken);
+    }
+
+    /**
+     * Construit l'URL de suivi complète pour une demande
+     */
+    public String buildTrackingUrl(String trackingToken, String baseUrl) {
+        if (trackingToken == null) {
+            return null;
+        }
+        // Si baseUrl se termine par ?token=, ajouter le token directement
+        // Sinon, construire l'URL standard
+        if (baseUrl.endsWith("?token=")) {
+            return baseUrl + trackingToken;
+        } else if (baseUrl.endsWith("/tracking.html")) {
+            return baseUrl + "?token=" + trackingToken;
+        } else {
+            // Format par défaut
+            return baseUrl + "?token=" + trackingToken;
+        }
+    }
 }

@@ -200,3 +200,13 @@ PRIMARY KEY(id_demande, id_piece),
 FOREIGN KEY(id_demande) REFERENCES demande(id_demande),
 FOREIGN KEY(id_piece) REFERENCES piece(id_piece)
 );
+
+-- =========================================
+-- ALTERATIONS DES TABLES (SPRINT 3 ET 4)
+-- =========================================
+ALTER TABLE demande ADD COLUMN tracking_token VARCHAR(255) UNIQUE;
+
+-- =========================================
+-- INDEXES (SPRINT 4)
+-- =========================================
+CREATE INDEX idx_tracking_token ON demande(tracking_token);
