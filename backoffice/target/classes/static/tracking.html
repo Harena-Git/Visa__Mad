@@ -920,7 +920,8 @@
 
             try {
                 const baseUrl = window.location.origin + '/visa-backoffice/tracking.html?token=';
-                const url = '/visa-backoffice/api/demandes/' + encodeURIComponent(demandeId) + '/generate-qr?baseUrl=' + encodeURIComponent(baseUrl);
+                const url = '/visa-backoffice/api/demandes/' + encodeURIComponent(demandeId)
+                    + '/generate-qr?mode=data&baseUrl=' + encodeURIComponent(baseUrl);
                 
                 const response = await fetch(url, {
                     method: 'POST',
@@ -935,11 +936,15 @@
                 if (response.ok && data.success) {
                     // Afficher les résultats
                     document.getElementById('generatedToken').value = data.trackingToken;
-                    document.getElementById('generatedUrl').value = data.trackingUrl || (baseUrl + data.trackingToken);
+                    if (data.qrType === 'inline_data') {
+                        document.getElementById('generatedUrl').value = 'QR autonome: les informations de suivi sont intégrées directement dans le QR.';
+                    } else {
+                        document.getElementById('generatedUrl').value = data.trackingUrl || (baseUrl + data.trackingToken);
+                    }
                     // Utiliser 'qrCode' qui contient déjà le préfixe 'data:image/png;base64,'
                     document.getElementById('generatedQRCode').src = data.qrCode;
                     document.getElementById('generationResult').style.display = 'block';
-                    showSuccess('Lien de suivi généré avec succès !');
+                    showSuccess('QR code généré avec succès !');
                     
                     // Afficher dans la console pour verification
                     console.log('Token généré:', data.trackingToken);

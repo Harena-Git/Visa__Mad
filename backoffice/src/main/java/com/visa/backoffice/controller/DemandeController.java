@@ -478,7 +478,8 @@ public class DemandeController {
     @PostMapping("/{demandeId}/generate-qr")
     public ResponseEntity<?> generateQRCode(
             @PathVariable String demandeId,
-            @RequestParam(defaultValue = "http://localhost:8080") String baseUrl) {
+            @RequestParam(required = false) String baseUrl,
+            @RequestParam(defaultValue = "data") String mode) {
         try {
             Optional<Demande> demandeOpt = demandeService.findById(demandeId);
             
@@ -496,16 +497,32 @@ public class DemandeController {
                 demande = demandeService.findById(demandeId).get(); // Rafraîchir
             }
 
-            // Construire l'URL de suivi complète
-            String trackingUrl = demandeService.buildTrackingUrl(trackingToken, baseUrl);
+            String normalizedMode = (mode == null || mode.isBlank()) ? "data" : mode.trim().toLowerCase();
+            String trackingUrl = null;
+            String qrContent;
+            String qrType;
 
-            // Générer le QR code en Base64
-            String qrCodeBase64 = qrCodeService.generateQRCodeBase64(trackingUrl, 400);
+            if ("url".equals(normalizedMode)) {
+                String effectiveBaseUrl = (baseUrl == null || baseUrl.isBlank())
+                        ? "http://localhost:8080/visa-backoffice/tracking.html?token="
+                        : baseUrl;
+                trackingUrl = demandeService.buildTrackingUrl(trackingToken, effectiveBaseUrl);
+                qrContent = trackingUrl;
+                qrType = "url";
+            } else {
+                qrContent = buildInlineTrackingPayload(demande);
+                qrType = "inline_data";
+            }
+
+            // Générer le QR code en Base64 à partir du contenu choisi
+            String qrCodeBase64 = qrCodeService.generateQRCodeBase64(qrContent, 400);
 
             return ResponseEntity.ok(Map.of(
                 "success", true,
                 "trackingToken", trackingToken,
-                "trackingUrl", trackingUrl,
+                "trackingUrl", trackingUrl != null ? trackingUrl : "",
+                "qrContent", qrContent,
+                "qrType", qrType,
                 "qrCode", "data:image/png;base64," + qrCodeBase64,
                 "demandeId", demandeId
             ));
@@ -515,6 +532,44 @@ public class DemandeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 Map.of("success", false, "error", "Erreur lors de la génération du QR code: " + e.getMessage()));
         }
+    }
+
+    private String buildInlineTrackingPayload(Demande demande) {
+        String demandeId = demande.getId() != null ? demande.getId() : "N/A";
+        String demandeurNom = "N/A";
+        if (demande.getDemandeur() != null) {
+            String prenom = demande.getDemandeur().getPrenom() != null ? demande.getDemandeur().getPrenom() : "";
+            String nom = demande.getDemandeur().getNom() != null ? demande.getDemandeur().getNom() : "";
+            String fullName = (prenom + " " + nom).trim();
+            if (!fullName.isEmpty()) {
+                demandeurNom = fullName;
+            }
+        }
+        String typeVisa = (demande.getTypeVisa() != null && demande.getTypeVisa().getLibelle() != null)
+                ? demande.getTypeVisa().getLibelle()
+                : "N/A";
+        String categorie = (demande.getCategorie() != null && demande.getCategorie().getLibelle() != null)
+                ? demande.getCategorie().getLibelle()
+                : "N/A";
+
+        List<StatutDemande> statuts = statutDemandeRepository.findByDemandeId(demandeId);
+        String statutActuel = "Créée";
+        if (!statuts.isEmpty()) {
+            StatutDemande dernier = statuts.get(statuts.size() - 1);
+            if (dernier.getStatut() != null && dernier.getStatut().getLibelle() != null
+                    && !dernier.getStatut().getLibelle().isBlank()) {
+                statutActuel = dernier.getStatut().getLibelle();
+            }
+        }
+
+        return "SUIVI DEMANDE VISA\n"
+                + "Demande ID: " + demandeId + "\n"
+                + "Demandeur: " + demandeurNom + "\n"
+                + "Type Visa: " + typeVisa + "\n"
+                + "Categorie: " + categorie + "\n"
+                + "Statut Actuel: " + statutActuel + "\n"
+                + "Date Creation: " + (demande.getCreatedAt() != null ? demande.getCreatedAt() : "N/A") + "\n"
+                + "Token: " + (demande.getTrackingToken() != null ? demande.getTrackingToken() : "N/A");
     }
 
     /**

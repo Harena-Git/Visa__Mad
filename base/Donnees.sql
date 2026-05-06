@@ -4,8 +4,6 @@
 -- Ce fichier contient tous les données de test et de configuration
 -- =========================================
 
-\c visa_db;
-
 -- =====================================================
 -- 1. INSERTION DES TYPES DE VISA
 -- =====================================================
@@ -16,7 +14,8 @@ INSERT INTO type_visa (id_type_visa, libelle) VALUES
 ('TV002', 'Visa Affaires'),
 ('TV003', 'Visa Étudiant'),
 ('TV004', 'Visa Travail'),
-('TV005', 'Visa Familial')
+('TV005', 'Visa Familial'),
+('TV_TEST', 'Visa Test')
 ON CONFLICT (id_type_visa) DO NOTHING;
 
 -- =====================================================
@@ -29,7 +28,8 @@ INSERT INTO situation_famille (id_situation_famille, libelle) VALUES
 ('SF002', 'Marié'),
 ('SF003', 'Divorcé'),
 ('SF004', 'Veuf(ve)'),
-('SF005', 'Concubinage')
+('SF005', 'Concubinage'),
+('SF_TEST', 'Situation Test')
 ON CONFLICT (id_situation_famille) DO NOTHING;
 
 -- =====================================================
@@ -44,7 +44,8 @@ INSERT INTO categorie_demande (id_categorie, libelle) VALUES
 ('CAT003', 'Transformation'),
 ('CAT004', 'Duplicata'),
 ('CAT005', 'Transfert'),
-('CAT006', 'Nouveau Titre (Injection)')
+('CAT006', 'Nouveau Titre (Injection)'),
+('CAT_TEST', 'Categorie Test')
 ON CONFLICT (id_categorie) DO NOTHING;
 
 -- =====================================================
