@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +20,6 @@ import com.visa.backoffice.entity.StatutDemande;
 import com.visa.backoffice.repository.StatutDemandeRepository;
 import com.visa.backoffice.service.DemandeService;
 import com.visa.backoffice.service.QRCodeService;
-import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Contrôleur public pour le suivi des demandes
@@ -220,8 +218,8 @@ public class TrackingController {
         // Ajouter le QR code si le tracking token existe
         if (demande.getTrackingToken() != null && !demande.getTrackingToken().isEmpty()) {
             try {
-                String trackingUrl = "http://localhost:8080/visa-backoffice/tracking.html?token=" + demande.getTrackingToken();
-                String qrCodeBase64 = qrCodeService.generateQRCodeBase64(trackingUrl, 400);
+                String qrPayload = buildInlineTrackingPayload(demande, statuts);
+                String qrCodeBase64 = qrCodeService.generateQRCodeBase64(qrPayload, 400);
                 demandInfo.put("qrCodeBase64", qrCodeBase64);
             } catch (Exception e) {
                 // Si la génération du QR code échoue, continuer sans
@@ -230,6 +228,44 @@ public class TrackingController {
         }
         
         return demandInfo;
+    }
+
+    private String buildInlineTrackingPayload(Demande demande, List<StatutDemande> statuts) {
+        String demandeId = demande.getId() != null ? demande.getId() : "N/A";
+        String demandeurNom = "N/A";
+        if (demande.getDemandeur() != null) {
+            String prenom = demande.getDemandeur().getPrenom() != null ? demande.getDemandeur().getPrenom() : "";
+            String nom = demande.getDemandeur().getNom() != null ? demande.getDemandeur().getNom() : "";
+            String fullName = (prenom + " " + nom).trim();
+            if (!fullName.isEmpty()) {
+                demandeurNom = fullName;
+            }
+        }
+
+        String typeVisa = (demande.getTypeVisa() != null && demande.getTypeVisa().getLibelle() != null)
+                ? demande.getTypeVisa().getLibelle()
+                : "N/A";
+        String categorie = (demande.getCategorie() != null && demande.getCategorie().getLibelle() != null)
+                ? demande.getCategorie().getLibelle()
+                : "N/A";
+
+        String statutActuel = "Créée";
+        if (!statuts.isEmpty()) {
+            StatutDemande lastStatut = statuts.get(statuts.size() - 1);
+            if (lastStatut.getStatut() != null && lastStatut.getStatut().getLibelle() != null
+                    && !lastStatut.getStatut().getLibelle().isBlank()) {
+                statutActuel = lastStatut.getStatut().getLibelle();
+            }
+        }
+
+        return "SUIVI DEMANDE VISA\n"
+                + "Demande ID: " + demandeId + "\n"
+                + "Demandeur: " + demandeurNom + "\n"
+                + "Type Visa: " + typeVisa + "\n"
+                + "Categorie: " + categorie + "\n"
+                + "Statut Actuel: " + statutActuel + "\n"
+                + "Date Creation: " + (demande.getCreatedAt() != null ? demande.getCreatedAt() : "N/A") + "\n"
+                + "Token: " + (demande.getTrackingToken() != null ? demande.getTrackingToken() : "N/A");
     }
 
     /**
