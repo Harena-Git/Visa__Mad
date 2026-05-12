@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Demandes de Visa - Vue.js</title>
+    <link rel="stylesheet" href="css/tracking.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app" v-cloak>
+        <!-- Header -->
+        <header class="header">
+            <h1>
+                🏛️ Ministère des Visas
+                <span style="font-size: 0.6rem; opacity: 0.8;">Suivi des Demandes</span>
+            </h1>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">🏠 Accueil</a></li>
+                    <li><a href="tracking-vue.html" class="active">📍 Suivi (Simple)</a></li>
+                    <li><a href="tracking-composants.html">📍 Suivi (Composants)</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-container">
+            <div class="tracking-container">
+                <!-- Hero Section -->
+                <div class="tracking-card">
+                    <h1 style="text-align: center; color: #333; margin-bottom: 20px;">
+                        Consultez le statut de votre demande de visa
+                    </h1>
+                    <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                        Entrez votre numéro de passeport ou le numéro de votre demande pour suivre votre dossier en temps réel.
+                    </p>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tracking-card">
+                    <div class="tabs">
+                        <button 
+                            v-for="tab in tabs" 
+                            :key="tab.id"
+                            @click="activeTab = tab.id"
+                            :class="['tab-button', { active: activeTab === tab.id }]"
+                        >
+                            {{ tab.label }}
+                        </button>
+                    </div>
+
+                    <!-- Tab 1: Recherche par Passeport -->
+                    <div v-show="activeTab === 'passport'" class="tab-content active">
+                        <div class="search-form">
+                            <div class="form-group">
+                                <label for="passportNumber">Numéro de Passeport *</label>
+                                <input 
+                                    v-model="passportNumber" 
+                                    id="passportNumber"
+                                    type="text" 
+                                    placeholder="Ex: PAD123456789"
+                                    @keyup.enter="searchByPassport"
+                                >
+                            </div>
+                            <button 
+                                class="btn-search" 
+                                @click="searchByPassport"
+                                :disabled="loading"
+                            >
+                                🔍 Rechercher mes Demandes
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Suivi par Token -->
+                    <div v-show="activeTab === 'token'" class="tab-content">
+                        <div class="qr-instruction">
+                            📱 Vous avez reçu un QR code ? Scannez-le ou collez le code de suivi ci-dessous.
+                        </div>
+                        <div class="search-form">
+                            <div class="form-group">
+                                <label for="trackingToken">Code de Suivi ou Lien *</label>
+                                <input 
+                                    v-model="trackingToken" 
+                                    id="trackingToken"
+                                    type="text" 
+                                    placeholder="Collez le code unique de suivi reçu"
+                                    @keyup.enter="searchByToken"
+                                >
+                            </div>
+                            <button 
+                                class="btn-search" 
+                                @click="searchByToken"
+                                :disabled="loading"
+                            >
+                                🔗 Accéder à mon Suivi
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Générer un Lien de Suivi -->
+                    <div v-show="activeTab === 'generate'" class="tab-content">
+                        <div class="qr-instruction">
+                            🔑 Entrez le numéro de votre demande pour générer un lien de suivi unique avec QR code.
+                        </div>
+                        <div class="generation-form">
+                            <div class="form-group">
+                                <label for="demandeIdInput">Numéro de Demande *</label>
+                                <input 
+                                    v-model="demandeIdInput" 
+                                    id="demandeIdInput"
+                                    type="text" 
+                                    placeholder="Ex: REQ-SPRINT4-001"
+                                    @keyup.enter="generateTrackingLink"
+                                >
+                            </div>
+                            <button 
+                                class="btn-search" 
+                                @click="generateTrackingLink"
+                                :disabled="loading"
+                            >
+                                🎯 Générer le Lien de Suivi
+                            </button>
+                        </div>
+                        <div v-if="generationResult.success" style="margin-top: 20px;">
+                            <h3 style="color: #333; margin-bottom: 15px;">✅ Lien généré avec succès</h3>
+                            <div class="token-label">Code de Suivi Unique :</div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input 
+                                    type="text"
+                                    :value="generationResult.token"
+                                    readonly
+                                    style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace;"
+                                >
+                                <button class="copy-btn" @click="copyToClipboard('token')">📋 Copier</button>
+                            </div>
+                            <div class="token-label" style="margin-top: 20px;">URL de Suivi Complète :</div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input 
+                                    type="text"
+                                    :value="generationResult.url"
+                                    readonly
+                                    style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 12px;"
+                                >
+                                <button class="copy-btn" @click="copyToClipboard('url')">📋 Copier</button>
+                            </div>
+                            <div class="qr-code-container">
+                                <div class="qr-code-info">📲 Code QR pour partager</div>
+                                <img :src="generationResult.qrCode" alt="QR Code" class="qr-code-image">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages d'erreur et de succès -->
+                    <transition name="fade">
+                        <div v-if="errorMessage" class="error-message">
+                            {{ errorMessage }}
+                        </div>
+                    </transition>
+                    <transition name="fade">
+                        <div v-if="successMessage" class="success-message">
+                            {{ successMessage }}
+                        </div>
+                    </transition>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div v-if="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Chargement en cours...</p>
+                </div>
+
+                <!-- Résultats -->
+                <div v-if="results.length > 0" class="results-container">
+                    <h2 style="margin-bottom: 20px;">{{ resultsTitle }}</h2>
+                    <div 
+                        v-for="result in results"
+                        :key="result.demandeId"
+                        class="demande-card"
+                    >
+                        <div class="demande-header">
+                            <div class="demande-id">{{ result.demandeId }}</div>
+                            <div :class="['status-badge', getStatusClass(result.statutActuel)]">
+                                {{ result.statutActuel }}
+                            </div>
+                        </div>
+
+                        <div class="demande-info">
+                            <div class="info-row">
+                                <span class="info-label">👤 Demandeur</span>
+                                <span class="info-value">
+                                    {{ result.demandeur?.prenom }} {{ result.demandeur?.nom }}
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">🛂 Type de Visa</span>
+                                <span class="info-value">{{ result.typeVisa }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">📂 Catégorie</span>
+                                <span class="info-value">{{ result.categorie }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">📅 Date de Création</span>
+                                <span class="info-value">{{ formatDate(result.dateCreation) }}</span>
+                            </div>
+                        </div>
+
+                        <!-- QR Code -->
+                        <div v-if="result.qrCodeBase64" class="qr-code-container">
+                            <div class="qr-code-info">📲 Code QR pour suivi rapide</div>
+                            <img :src="'data:image/png;base64,' + result.qrCodeBase64" :alt="'QR Code - ' + result.demandeId" class="qr-code-image">
+                            <div class="qr-code-info">Token: {{ result.trackingToken }}</div>
+                        </div>
+
+                        <!-- Timeline -->
+                        <div v-if="result.historique && result.historique.length > 0" class="timeline">
+                            <div class="timeline-title">📋 Historique des Statuts</div>
+                            <div 
+                                v-for="(item, index) in result.historique"
+                                :key="index"
+                                class="timeline-item"
+                            >
+                                <div class="timeline-content">
+                                    <div class="timeline-date">{{ formatDate(item.date) }}</div>
+                                    <div class="timeline-status">{{ item.statut }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div v-if="!loading && searchPerformed && results.length === 0" class="results-container">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <h3>Aucune demande trouvée</h3>
+                        <p>Modifiez votre recherche et réessayez.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer style="text-align: center; padding: 20px; color: #666; border-top: 1px solid #f0f0f0; margin-top: 30px;">
+            <p>&copy; 2026 Ministère des Visas. Tous droits réservés.</p>
+            <p style="font-size: 12px; margin-top: 10px;">
+                Pour toute assistance, contactez le support : <a href="tel:+261" style="color: #0066cc;">Support Client</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Vue.js 3 from CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Application -->
+    <script src="js/tracking-app.js"></script>
+</body>
+</html>

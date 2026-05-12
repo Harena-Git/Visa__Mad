@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Demandes - Vue.js Composants</title>
+    <link rel="stylesheet" href="css/tracking.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app" v-cloak>
+        <!-- Header -->
+        <header class="header">
+            <h1>
+                🏛️ Ministère des Visas
+                <span style="font-size: 0.6rem; opacity: 0.8;">Suivi via Composants Vue.js</span>
+            </h1>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">🏠 Accueil</a></li>
+                    <li><a href="tracking-vue.html">📍 Suivi (Simple)</a></li>
+                    <li><a href="tracking-composants.html" class="active">📍 Suivi (Composants)</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-container">
+            <div class="tracking-container">
+                <!-- Hero Section -->
+                <div class="tracking-card">
+                    <h1 style="text-align: center; color: #333; margin-bottom: 20px;">
+                        Suivi des Demandes de Visa
+                    </h1>
+                    <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                        Cette version utilise des composants Vue.js réutilisables pour une meilleure maintenabilité.
+                    </p>
+                </div>
+
+                <!-- Tabs Navigation -->
+                <div class="tracking-card">
+                    <div class="tabs">
+                        <button 
+                            v-for="tab in tabs" 
+                            :key="tab.id"
+                            @click="selectTab(tab.id)"
+                            :class="['tab-button', { active: activeTab === tab.id }]"
+                        >
+                            {{ tab.label }}
+                        </button>
+                    </div>
+
+                    <!-- Messages -->
+                    <transition name="fade">
+                        <div v-if="message.text" :class="['message', message.type]">
+                            {{ message.text }}
+                        </div>
+                    </transition>
+
+                    <!-- Tab Content -->
+                    <component 
+                        :is="currentTabComponent"
+                        :state="currentTabState"
+                        @search="handleSearch"
+                        @generate="handleGenerate"
+                        @copy="copyToClipboard"
+                        @clear="clearMessages"
+                    />
+                </div>
+
+                <!-- Loading -->
+                <div v-if="loading" class="tracking-card">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Chargement en cours...</p>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div v-if="!loading && results.length > 0" class="tracking-card">
+                    <h2 style="margin-bottom: 20px;">{{ resultsTitle }}</h2>
+                    <transition-group name="list" tag="div">
+                        <search-result-card 
+                            v-for="result in results"
+                            :key="result.demandeId"
+                            :result="result"
+                            @copy="copyToClipboard"
+                        />
+                    </transition-group>
+                </div>
+
+                <!-- Empty State -->
+                <div v-if="!loading && searchPerformed && results.length === 0" class="tracking-card">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <h3>Aucune demande trouvée</h3>
+                        <p>Modifiez votre recherche et réessayez.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer style="text-align: center; padding: 20px; color: #666; border-top: 1px solid #f0f0f0; margin-top: 30px;">
+            <p>&copy; 2026 Ministère des Visas. Tous droits réservés.</p>
+        </footer>
+    </div>
+
+    <!-- Vue.js 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Application avec Composants -->
+    <script src="js/tracking-composants.js"></script>
+</body>
+</html>

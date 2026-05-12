@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Demandes de Visa - Vue.js</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        .tracking-container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .tracking-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            border-bottom-color: #0066cc;
+            color: #0066cc;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .search-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 5px rgba(0,102,204,0.3);
+        }
+
+        .btn-search {
+            background-color: #0066cc;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-search:hover {
+            background-color: #0052a3;
+        }
+
+        .btn-search:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .results-container {
+            margin-top: 30px;
+        }
+
+        .results-container:empty {
+            display: none;
+        }
+
+        .demande-card {
+            background: #f9f9f9;
+            border-left: 4px solid #0066cc;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .demande-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .demande-id {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-badge.created {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-badge.in-progress {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-badge.completed {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-badge.rejected {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        .demande-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .timeline {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .timeline-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-left: 15px;
+            border-left: 2px solid #0066cc;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -9px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #0066cc;
+            border: 3px solid white;
+            box-shadow: 0 0 0 1px #0066cc;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-date {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 3px;
+        }
+
+        .timeline-status {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .error-message {
+            background-color: #ffebee;
+            color: #d32f2f;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        .success-message {
+            background-color: #e8f5e9;
+            color: #388e3c;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0066cc;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .qr-instruction {
+            background-color: #e3f2fd;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #1565c0;
+        }
+
+        .qr-code-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .qr-code-image {
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            border: 2px solid #0066cc;
+            border-radius: 4px;
+            padding: 10px;
+            background: white;
+        }
+
+        .qr-code-info {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .token-display {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 4px;
+            word-break: break-all;
+            font-family: monospace;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .copy-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .copy-btn:hover {
+            background-color: #45a049;
+        }
+
+        .token-label {
+            font-weight: 500;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .generation-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .v-enter-active, .v-leave-active {
+            transition: opacity 0.3s ease;
+        }
+
+        .v-enter-from, .v-leave-to {
+            opacity: 0;
+        }
+
+        @media (max-width: 768px) {
+            .demande-info,
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tracking-card {
+                padding: 20px;
+            }
+
+            .tracking-container {
+                margin: 10px;
+                padding: 10px;
+            }
+
+            .tab-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <h1>
+                🏛️ Ministère des Visas
+                <span style="font-size: 0.6rem; opacity: 0.8;">Suivi des Demandes (Vue.js)</span>
+            </h1>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">🏠 Accueil</a></li>
+                    <li><a href="tracking-vue.html" class="active">📍 Suivi des Demandes</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-container">
+            <div class="tracking-container">
+                <!-- Hero Section -->
+                <div class="tracking-card">
+                    <h1 style="text-align: center; color: #333; margin-bottom: 20px;">
+                        Consultez le statut de votre demande de visa
+                    </h1>
+                    <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                        Entrez votre numéro de passeport ou le numéro de votre demande pour suivre votre dossier en temps réel.
+                    </p>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tracking-card">
+                    <div class="tabs">
+                        <button 
+                            v-for="tab in tabs" 
+                            :key="tab.id"
+                            @click="activeTab = tab.id"
+                            :class="['tab-button', { active: activeTab === tab.id }]"
+                        >
+                            {{ tab.label }}
+                        </button>
+                    </div>
+
+                    <!-- Tab 1: Recherche par Passeport -->
+                    <div v-show="activeTab === 'passport'" class="tab-content active">
+                        <div class="search-form">
+                            <div class="form-group">
+                                <label for="passportNumber">Numéro de Passeport *</label>
+                                <input 
+                                    v-model="passportNumber" 
+                                    id="passportNumber"
+                                    type="text" 
+                                    placeholder="Ex: PAD123456789"
+                                    @keyup.enter="searchByPassport"
+                                >
+                            </div>
+                            <button 
+                                class="btn-search" 
+                                @click="searchByPassport"
+                                :disabled="loading"
+                            >
+                                🔍 Rechercher mes Demandes
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Suivi par Token -->
+                    <div v-show="activeTab === 'token'" class="tab-content">
+                        <div class="qr-instruction">
+                            📱 Vous avez reçu un QR code ? Scannez-le ou collez le code de suivi ci-dessous.
+                        </div>
+                        <div class="search-form">
+                            <div class="form-group">
+                                <label for="trackingToken">Code de Suivi ou Lien *</label>
+                                <input 
+                                    v-model="trackingToken" 
+                                    id="trackingToken"
+                                    type="text" 
+                                    placeholder="Collez le code unique de suivi reçu"
+                                    @keyup.enter="searchByToken"
+                                >
+                            </div>
+                            <button 
+                                class="btn-search" 
+                                @click="searchByToken"
+                                :disabled="loading"
+                            >
+                                🔗 Accéder à mon Suivi
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Générer un Lien de Suivi -->
+                    <div v-show="activeTab === 'generate'" class="tab-content">
+                        <div class="qr-instruction">
+                            🔑 Entrez le numéro de votre demande pour générer un lien de suivi unique avec QR code.
+                        </div>
+                        <div class="generation-form">
+                            <div class="form-group">
+                                <label for="demandeIdInput">Numéro de Demande *</label>
+                                <input 
+                                    v-model="demandeIdInput" 
+                                    id="demandeIdInput"
+                                    type="text" 
+                                    placeholder="Ex: REQ-SPRINT4-001"
+                                    @keyup.enter="generateTrackingLink"
+                                >
+                            </div>
+                            <button 
+                                class="btn-search" 
+                                @click="generateTrackingLink"
+                                :disabled="loading"
+                            >
+                                🎯 Générer le Lien de Suivi
+                            </button>
+                        </div>
+                        <div v-if="generationResult.success" style="margin-top: 20px;">
+                            <h3 style="color: #333; margin-bottom: 15px;">✅ Lien généré avec succès</h3>
+                            <div class="token-label">Code de Suivi Unique :</div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input 
+                                    type="text"
+                                    :value="generationResult.token"
+                                    readonly
+                                    style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace;"
+                                >
+                                <button class="copy-btn" @click="copyToClipboard('token')">📋 Copier</button>
+                            </div>
+                            <div class="token-label" style="margin-top: 20px;">URL de Suivi Complète :</div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <input 
+                                    type="text"
+                                    :value="generationResult.url"
+                                    readonly
+                                    style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 12px;"
+                                >
+                                <button class="copy-btn" @click="copyToClipboard('url')">📋 Copier</button>
+                            </div>
+                            <div class="qr-code-container">
+                                <div class="qr-code-info">📲 Code QR pour partager</div>
+                                <img :src="generationResult.qrCode" alt="QR Code" class="qr-code-image">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages d'erreur et de succès -->
+                    <transition name="fade">
+                        <div v-if="errorMessage" class="error-message">
+                            {{ errorMessage }}
+                        </div>
+                    </transition>
+                    <transition name="fade">
+                        <div v-if="successMessage" class="success-message">
+                            {{ successMessage }}
+                        </div>
+                    </transition>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div v-if="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Chargement en cours...</p>
+                </div>
+
+                <!-- Résultats -->
+                <div v-if="results.length > 0" class="results-container">
+                    <h2 style="margin-bottom: 20px;">
+                        {{ resultsTitle }}
+                    </h2>
+                    <div 
+                        v-for="result in results"
+                        :key="result.demandeId"
+                        class="demande-card"
+                    >
+                        <div class="demande-header">
+                            <div class="demande-id">{{ result.demandeId }}</div>
+                            <div :class="['status-badge', getStatusClass(result.statutActuel)]">
+                                {{ result.statutActuel }}
+                            </div>
+                        </div>
+
+                        <div class="demande-info">
+                            <div class="info-row">
+                                <span class="info-label">👤 Demandeur</span>
+                                <span class="info-value">
+                                    {{ result.demandeur?.prenom }} {{ result.demandeur?.nom }}
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">🛂 Type de Visa</span>
+                                <span class="info-value">{{ result.typeVisa }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">📂 Catégorie</span>
+                                <span class="info-value">{{ result.categorie }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">📅 Date de Création</span>
+                                <span class="info-value">{{ formatDate(result.dateCreation) }}</span>
+                            </div>
+                        </div>
+
+                        <!-- QR Code -->
+                        <div v-if="result.qrCodeBase64" class="qr-code-container">
+                            <div class="qr-code-info">📲 Code QR pour suivi rapide</div>
+                            <img :src="'data:image/png;base64,' + result.qrCodeBase64" :alt="'QR Code - ' + result.demandeId" class="qr-code-image">
+                            <div class="qr-code-info">Token: {{ result.trackingToken }}</div>
+                        </div>
+
+                        <!-- Timeline -->
+                        <div v-if="result.historique && result.historique.length > 0" class="timeline">
+                            <div class="timeline-title">📋 Historique des Statuts</div>
+                            <div 
+                                v-for="(item, index) in result.historique"
+                                :key="index"
+                                class="timeline-item"
+                            >
+                                <div class="timeline-content">
+                                    <div class="timeline-date">{{ formatDate(item.date) }}</div>
+                                    <div class="timeline-status">{{ item.statut }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div v-if="!loading && searchPerformed && results.length === 0" class="results-container">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <h3>Aucune demande trouvée</h3>
+                        <p>Aucune demande n'a été trouvée pour les critères de recherche.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer style="text-align: center; padding: 20px; color: #666; border-top: 1px solid #f0f0f0; margin-top: 30px;">
+            <p>&copy; 2026 Ministère des Visas. Tous droits réservés.</p>
+            <p style="font-size: 12px; margin-top: 10px;">
+                Pour toute assistance, contactez le support : <a href="tel:+261" style="color: #0066cc;">Support Client</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Vue.js 3 from CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Application -->
+    <script src="js/tracking-app.js"></script>
+</body>
+</html>
