@@ -47,10 +47,10 @@ public class DemandeController {
 
     @Autowired
     private DemandeService demandeService;
-    
+
     @Autowired
     private QRCodeService qrCodeService;
-    
+
     @Autowired
     private CheckPieceRepository checkPieceRepository;
 
@@ -211,7 +211,7 @@ public class DemandeController {
 
         try {
             System.out.println("🔵 [UPLOAD START] DemandeId: " + demandeId + ", FileName: " + file.getOriginalFilename() + ", Size: " + file.getSize());
-            
+
             // 1. Vérifier que la demande existe
             Optional<Demande> demandeOpt = demandeService.findById(demandeId);
             if (!demandeOpt.isPresent()) {
@@ -245,7 +245,7 @@ public class DemandeController {
             String contentType = file.getContentType();
             String originalFileName = file.getOriginalFilename();
             System.out.println("📋 [UPLOAD] Content-Type: " + contentType + ", FileName: " + originalFileName);
-            
+
             if (!isValidFileType(contentType, originalFileName)) {
                 System.out.println("❌ [UPLOAD] Type de fichier non autorisé: " + contentType + " pour " + originalFileName);
                 return ResponseEntity.badRequest().body(
@@ -270,7 +270,7 @@ public class DemandeController {
             System.out.println("📝 [UPLOAD] Mise à jour CheckPiece pour demandeId: " + demandeId);
             List<CheckPiece> checkPieces = checkPieceRepository.findByDemandeId(demandeId);
             System.out.println("📝 [UPLOAD] CheckPieces trouvées: " + checkPieces.size());
-            
+
             if (!checkPieces.isEmpty()) {
                 CheckPiece firstPiece = checkPieces.get(0);
                 firstPiece.setFileName(originalFileName);
@@ -284,7 +284,7 @@ public class DemandeController {
                 // Chercher une pièce disponible ou créer une par défaut
                 List<Piece> pieces = pieceRepository.findByIdTypeVisa(demande.getTypeVisa().getId());
                 String pieceId;
-                
+
                 if (!pieces.isEmpty()) {
                     pieceId = pieces.get(0).getId();
                 } else {
@@ -309,7 +309,7 @@ public class DemandeController {
                         }
                     }
                 }
-                
+
                 CheckPiece newCheckPiece = new CheckPiece();
                 CheckPieceId cpId = new CheckPieceId(demandeId, pieceId);
                 newCheckPiece.setId(cpId);
@@ -377,11 +377,23 @@ public class DemandeController {
             List<CheckPiece> checkPieces = checkPieceRepository.findByDemandeId(demandeId);
             boolean hasFile = checkPieces.stream()
                 .anyMatch(piece -> piece.getFileName() != null && !piece.getFileName().trim().isEmpty());
-            
+
             if (!hasFile) {
                 return ResponseEntity.badRequest().body(
-                    Map.of("success", false, "error", 
+                    Map.of("success", false, "error",
                         "Impossible de verrouiller: aucun fichier n'a été uploadé pour cette demande"));
+            }
+
+            // SPRINT 5: Vérifier que la photo et la signature existent
+            if (demande.getPhotoPath() == null || demande.getPhotoPath().isEmpty()) {
+                return ResponseEntity.badRequest().body(
+                    Map.of("success", false, "error",
+                        "Impossible de terminer le scan: la photo du demandeur est obligatoire"));
+            }
+            if (demande.getSignaturePath() == null || demande.getSignaturePath().isEmpty()) {
+                return ResponseEntity.badRequest().body(
+                    Map.of("success", false, "error",
+                        "Impossible de terminer le scan: la signature du demandeur est obligatoire"));
             }
 
             // 4. Récupérer l'ID du statut
@@ -398,7 +410,7 @@ public class DemandeController {
             if (!statutOpt.isPresent()) {
                 System.out.println("⚠️ Statut '" + idStatut + "' non trouvé en base.");
                 return ResponseEntity.badRequest().body(
-                    Map.of("success", false, "error", 
+                    Map.of("success", false, "error",
                         "Statut '" + idStatut + "' non trouvé. Assurez-vous qu'il existe en base de données"));
             }
 
@@ -456,7 +468,7 @@ public class DemandeController {
                 return true;
             }
         }
-        
+
         // Si content-type n'existe pas ou n'est pas reconnu, vérifier l'extension du fichier
         if (fileName != null) {
             String lowerFileName = fileName.toLowerCase();
@@ -467,7 +479,7 @@ public class DemandeController {
                    lowerFileName.endsWith(".gif") ||
                    lowerFileName.endsWith(".webp");
         }
-        
+
         return false;
     }
 
@@ -482,14 +494,14 @@ public class DemandeController {
             @RequestParam(defaultValue = "data") String mode) {
         try {
             Optional<Demande> demandeOpt = demandeService.findById(demandeId);
-            
+
             if (!demandeOpt.isPresent()) {
                 return ResponseEntity.badRequest().body(
                     Map.of("success", false, "error", "Demande non trouvée"));
             }
 
             Demande demande = demandeOpt.get();
-            
+
             // Générer ou récupérer le tracking token
             String trackingToken = demande.getTrackingToken();
             if (trackingToken == null || trackingToken.isEmpty()) {
@@ -531,6 +543,148 @@ public class DemandeController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 Map.of("success", false, "error", "Erreur lors de la génération du QR code: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * SPRINT 5: Upload de la photo du demandeur (base64)
+     * POST /api/demandes/{demandeId}/upload-photo
+     */
+    @PostMapping("/{demandeId}/upload-photo")
+    public ResponseEntity<?> uploadPhoto(
+            @PathVariable String demandeId,
+            @RequestBody Map<String, String> payload) {
+        try {
+            Optional<Demande> demandeOpt = demandeService.findById(demandeId);
+            if (!demandeOpt.isPresent()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "error", "Demande non trouvée"));
+            }
+            Demande demande = demandeOpt.get();
+            if (isDemandeVerrouille(demande)) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "error", "Demande verrouillée"));
+            }
+            String photoData = payload.get("photoData");
+            if (photoData == null || photoData.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "error", "Données photo manquantes"));
+            }
+            String base64Data = photoData.contains(",") ? photoData.split(",")[1] : photoData;
+            byte[] imageBytes = java.util.Base64.getDecoder().decode(base64Data);
+
+            String uploadDirPath = UPLOAD_DIR + demandeId;
+            Path dirPath = Paths.get(uploadDirPath);
+            Files.createDirectories(dirPath);
+
+            Path photoFilePath = Paths.get(uploadDirPath, "photo.jpg");
+            Files.write(photoFilePath, imageBytes);
+
+            demande.setPhotoPath(photoFilePath.toString());
+            demande.setUpdatedAt(LocalDate.now());
+            demandeService.updateDemande(demandeId, demande);
+
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Photo uploadée avec succès",
+                "photoPath", demande.getPhotoPath()
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("success", false, "error", "Erreur: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * SPRINT 5: Upload de la signature du demandeur (base64)
+     * POST /api/demandes/{demandeId}/upload-signature
+     */
+    @PostMapping("/{demandeId}/upload-signature")
+    public ResponseEntity<?> uploadSignature(
+            @PathVariable String demandeId,
+            @RequestBody Map<String, String> payload) {
+        try {
+            Optional<Demande> demandeOpt = demandeService.findById(demandeId);
+            if (!demandeOpt.isPresent()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "error", "Demande non trouvée"));
+            }
+            Demande demande = demandeOpt.get();
+            if (isDemandeVerrouille(demande)) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "error", "Demande verrouillée"));
+            }
+            String signatureData = payload.get("signatureData");
+            if (signatureData == null || signatureData.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "error", "Données signature manquantes"));
+            }
+            String base64Data = signatureData.contains(",") ? signatureData.split(",")[1] : signatureData;
+            byte[] imageBytes = java.util.Base64.getDecoder().decode(base64Data);
+
+            String uploadDirPath = UPLOAD_DIR + demandeId;
+            Path dirPath = Paths.get(uploadDirPath);
+            Files.createDirectories(dirPath);
+
+            Path signatureFilePath = Paths.get(uploadDirPath, "signature.png");
+            Files.write(signatureFilePath, imageBytes);
+
+            demande.setSignaturePath(signatureFilePath.toString());
+            demande.setUpdatedAt(LocalDate.now());
+            demandeService.updateDemande(demandeId, demande);
+
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Signature uploadée avec succès",
+                "signaturePath", demande.getSignaturePath()
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("success", false, "error", "Erreur: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * SPRINT 5: Récupérer la photo du demandeur
+     * GET /api/demandes/{demandeId}/photo
+     */
+    @GetMapping("/{demandeId}/photo")
+    public ResponseEntity<?> getPhoto(@PathVariable String demandeId) {
+        try {
+            Optional<Demande> demandeOpt = demandeService.findById(demandeId);
+            if (!demandeOpt.isPresent() || demandeOpt.get().getPhotoPath() == null) {
+                return ResponseEntity.notFound().build();
+            }
+            Path photoFilePath = Paths.get(demandeOpt.get().getPhotoPath());
+            if (!Files.exists(photoFilePath)) {
+                return ResponseEntity.notFound().build();
+            }
+            byte[] photoBytes = Files.readAllBytes(photoFilePath);
+            return ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.IMAGE_JPEG)
+                .body(photoBytes);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * SPRINT 5: Récupérer la signature du demandeur
+     * GET /api/demandes/{demandeId}/signature
+     */
+    @GetMapping("/{demandeId}/signature")
+    public ResponseEntity<?> getSignature(@PathVariable String demandeId) {
+        try {
+            Optional<Demande> demandeOpt = demandeService.findById(demandeId);
+            if (!demandeOpt.isPresent() || demandeOpt.get().getSignaturePath() == null) {
+                return ResponseEntity.notFound().build();
+            }
+            Path signatureFilePath = Paths.get(demandeOpt.get().getSignaturePath());
+            if (!Files.exists(signatureFilePath)) {
+                return ResponseEntity.notFound().build();
+            }
+            byte[] sigBytes = Files.readAllBytes(signatureFilePath);
+            return ResponseEntity.ok()
+                .contentType(org.springframework.http.MediaType.IMAGE_PNG)
+                .body(sigBytes);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -580,36 +734,36 @@ public class DemandeController {
     public ResponseEntity<?> getDemandeTracking(@PathVariable String trackingToken) {
         try {
             Optional<Demande> demandeOpt = demandeService.findByTrackingToken(trackingToken);
-            
+
             if (!demandeOpt.isPresent()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                     Map.of("success", false, "error", "Demande non trouvée"));
             }
 
             Demande demande = demandeOpt.get();
-            
+
             // Préparer les informations de suivi
             Map<String, Object> trackingInfo = new HashMap<>();
             trackingInfo.put("demandeId", demande.getId());
-            trackingInfo.put("demandeurNom", demande.getDemandeur() != null ? 
+            trackingInfo.put("demandeurNom", demande.getDemandeur() != null ?
                 demande.getDemandeur().getNom() : "");
-            trackingInfo.put("demandeurPrenom", demande.getDemandeur() != null ? 
+            trackingInfo.put("demandeurPrenom", demande.getDemandeur() != null ?
                 demande.getDemandeur().getPrenom() : "");
-            trackingInfo.put("typeVisa", demande.getTypeVisa() != null ? 
+            trackingInfo.put("typeVisa", demande.getTypeVisa() != null ?
                 demande.getTypeVisa().getLibelle() : "");
-            trackingInfo.put("categorie", demande.getCategorie() != null ? 
+            trackingInfo.put("categorie", demande.getCategorie() != null ?
                 demande.getCategorie().getLibelle() : "");
             trackingInfo.put("createdAt", demande.getCreatedAt());
             trackingInfo.put("updatedAt", demande.getUpdatedAt());
-            
+
             // Ajouter les statuts de la demande
             List<StatutDemande> statuts = statutDemandeRepository.findByDemandeId(demande.getId());
             trackingInfo.put("statuts", statuts);
-            
+
             // Déterminer l'état actuel
             if (!statuts.isEmpty()) {
                 StatutDemande lastStatut = statuts.get(statuts.size() - 1);
-                trackingInfo.put("currentStatut", lastStatut.getStatut() != null ? 
+                trackingInfo.put("currentStatut", lastStatut.getStatut() != null ?
                     lastStatut.getStatut().getLibelle() : "N/A");
             } else {
                 trackingInfo.put("currentStatut", "Créée");

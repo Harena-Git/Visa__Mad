@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -103,9 +106,26 @@ public class AttestationPdfService {
         document.add(etatCivil);
         document.add(new Paragraph("\n"));
 
+        // ========== SPRINT 5: PHOTO DU DEMANDEUR ==========
+        if (demande.getPhotoPath() != null && !demande.getPhotoPath().isEmpty()) {
+            Path photoFilePath = Paths.get(demande.getPhotoPath());
+            if (Files.exists(photoFilePath)) {
+                try {
+                    document.add(createSectionTitle("2. PHOTO DU DEMANDEUR", headerFont));
+                    Image photo = Image.getInstance(photoFilePath.toAbsolutePath().toString());
+                    photo.scaleToFit(120, 150);
+                    photo.setAlignment(Element.ALIGN_LEFT);
+                    document.add(photo);
+                    document.add(new Paragraph("\n"));
+                } catch (Exception e) {
+                    System.err.println("Impossible d'ajouter la photo au PDF: " + e.getMessage());
+                }
+            }
+        }
+
         // ========== SECTION PASSEPORT ==========
         // Rechercher le passeport via les visas ou cartes résidence
-        document.add(createSectionTitle("2. INFORMATIONS PASSEPORT", headerFont));
+        document.add(createSectionTitle("3. INFORMATIONS PASSEPORT", headerFont));
         PdfPTable passeportTable = createInfoTable();
         // On cherche les passeports du demandeur
         // Pour l'instant, on affiche via la demande liée
@@ -118,7 +138,7 @@ public class AttestationPdfService {
         document.add(new Paragraph("\n"));
 
         // ========== SECTION DEMANDE ==========
-        document.add(createSectionTitle("3. INFORMATIONS DE LA DEMANDE", headerFont));
+        document.add(createSectionTitle("4. INFORMATIONS DE LA DEMANDE", headerFont));
         PdfPTable demandeTable = createInfoTable();
         addInfoRow(demandeTable, "ID Demande", demande.getId(), normalFont);
         addInfoRow(demandeTable, "Catégorie", demande.getCategorie() != null ? demande.getCategorie().getLibelle() : "", normalFont);
@@ -129,7 +149,7 @@ public class AttestationPdfService {
         document.add(new Paragraph("\n"));
 
         // ========== SECTION PIÈCES FOURNIES ==========
-        document.add(createSectionTitle("4. PIÈCES JUSTIFICATIVES REÇUES", headerFont));
+        document.add(createSectionTitle("5. PIÈCES JUSTIFICATIVES REÇUES", headerFont));
         List<CheckPiece> pieces = checkPieceRepository.findByDemandeId(idDemande);
         if (pieces != null && !pieces.isEmpty()) {
             PdfPTable piecesTable = new PdfPTable(3);
@@ -152,6 +172,23 @@ public class AttestationPdfService {
         }
 
         document.add(new Paragraph("\n\n"));
+
+        // ========== SPRINT 5: SIGNATURE DU DEMANDEUR ==========
+        if (demande.getSignaturePath() != null && !demande.getSignaturePath().isEmpty()) {
+            Path signatureFilePath = Paths.get(demande.getSignaturePath());
+            if (Files.exists(signatureFilePath)) {
+                try {
+                    document.add(createSectionTitle("Signature du Demandeur", headerFont));
+                    Image signatureImg = Image.getInstance(signatureFilePath.toAbsolutePath().toString());
+                    signatureImg.scaleToFit(200, 80);
+                    signatureImg.setAlignment(Element.ALIGN_LEFT);
+                    document.add(signatureImg);
+                    document.add(new Paragraph("\n\n"));
+                } catch (Exception e) {
+                    System.err.println("Impossible d'ajouter la signature au PDF: " + e.getMessage());
+                }
+            }
+        }
 
         // ========== SIGNATURE ==========
         Paragraph signature = new Paragraph("Fait à Antananarivo, le " +
