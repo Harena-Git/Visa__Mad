@@ -65,6 +65,12 @@ public class Demande {
     @Column(name = "tracking_token", unique = true, nullable = true, length = 255)
     private String trackingToken;
 
+    @Column(name = "photo_path")
+    private String photoPath;
+
+    @Column(name = "signature_path")
+    private String signaturePath;
+
     public Demande() {}
 
     public String getId() {
@@ -171,4 +177,9 @@ public class Demande {
     public void setTrackingToken(String trackingToken) {
         this.trackingToken = trackingToken;
     }
+
+    public String getPhotoPath() { return photoPath; }
+    public void setPhotoPath(String photoPath) { this.photoPath = photoPath; }
+    public String getSignaturePath() { return signaturePath; }
+    public void setSignaturePath(String signaturePath) { this.signaturePath = signaturePath; }
 }

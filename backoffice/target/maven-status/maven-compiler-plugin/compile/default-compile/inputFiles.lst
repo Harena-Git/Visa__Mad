@@ -1,75 +1,75 @@
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\PieceController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\exception\GlobalExceptionHandler.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\VisaRepository.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Visa.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Champs.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Demandeur.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\AntecedentService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\CategorieDemandeService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\DemandeurRepository.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\VisaController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Nationalite.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\DemandeRepository.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\CarteResidenceController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\AntecedentController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\StatutDemandeService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\TrackingController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\TypeVisaController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\TypeVisaRepository.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\PassportService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\VisaBackofficeApplication.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\StatutDemande.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Passport.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\VisaService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\VisaTransformableRepository.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\VisaTransformableService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\dto\AntecedentDTO.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\SituationFamilleService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\DemandeController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\dto\CasProblematiqueRequest.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\CategorieDemande.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\StatutController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\config\TomcatConfig.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\ChampsRepository.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\PieceService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\NationaliteController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\VisaTransformableController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\CategorieDemandeRepository.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\CheckPieceController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\config\ExcludeConfig.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\config\WebConfig.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Statut.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\CarteResidenceRepository.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\PassportRepository.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\exception\ResourceNotFoundException.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\PassportController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\CarteResidence.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\SituationFamilleRepository.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\TypeVisa.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\DemandeurService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Demande.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\CheckPiece.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\NationaliteService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\CategorieDemandeController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\DemandeurController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Piece.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\CarteResidenceService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\SituationFamille.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\SituationFamilleController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\AttestationPdfService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\exception\ResourceAlreadyExistsException.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\DemandeService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\StatutDemandeRepository.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\StatutRepository.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\WebController.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\NationaliteRepository.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\QRCodeService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\VisaTransformable.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\CheckPieceService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\StatutService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\config\JpaConfig.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\config\TemporaryFixConfig.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\CheckPieceRepository.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\TypeVisaService.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\CheckPieceId.java
-C:\Users\tolot\OneDrive\Bureau\ITU\S6\Mr_Naina\codes\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\PieceRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\CarteResidence.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\ChampsRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\DemandeurService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\SituationFamilleService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\DemandeurRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\VisaBackofficeApplication.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\AttestationPdfService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\config\WebConfig.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\SituationFamilleRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\dto\AntecedentDTO.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\CarteResidenceService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\config\TomcatConfig.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Champs.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Nationalite.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Statut.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\TrackingController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\AntecedentService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\VisaController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\StatutDemande.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\VisaRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Visa.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\CarteResidenceRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\dto\CasProblematiqueRequest.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\PieceService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\exception\ResourceAlreadyExistsException.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\VisaTransformableService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\CheckPieceRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\StatutController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Piece.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\SituationFamilleController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\exception\ResourceNotFoundException.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\DemandeController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\QRCodeService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\TypeVisaRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\NationaliteController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\DemandeService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\exception\GlobalExceptionHandler.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\CheckPieceController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\StatutRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\DemandeRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\PieceController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\config\ExcludeConfig.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\StatutDemandeService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\CarteResidenceController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\AntecedentController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\CategorieDemandeController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\VisaService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Demande.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\CategorieDemandeService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\StatutService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\DemandeurController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\PieceRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\TypeVisaService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\CheckPieceId.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Passport.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\PassportRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\Demandeur.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\NationaliteService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\CheckPiece.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\CategorieDemande.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\VisaTransformableRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\PassportController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\WebController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\StatutDemandeRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\config\JpaConfig.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\VisaTransformable.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\VisaTransformableController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\TypeVisa.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\CategorieDemandeRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\PassportService.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\config\TemporaryFixConfig.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\entity\SituationFamille.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\controller\TypeVisaController.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\repository\NationaliteRepository.java
+D:\ITU\S6\Mr Naina\Visa\Visa__Mad\backoffice\src\main\java\com\visa\backoffice\service\CheckPieceService.java

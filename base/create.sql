@@ -210,3 +210,9 @@ ALTER TABLE demande ADD COLUMN tracking_token VARCHAR(255) UNIQUE;
 -- INDEXES (SPRINT 4)
 -- =========================================
 CREATE INDEX idx_tracking_token ON demande(tracking_token);
+
+-- =========================================
+-- SPRINT 5: Photo et Signature du demandeur
+-- =========================================
+ALTER TABLE demande ADD COLUMN IF NOT EXISTS photo_path VARCHAR(255);
+ALTER TABLE demande ADD COLUMN IF NOT EXISTS signature_path VARCHAR(255);

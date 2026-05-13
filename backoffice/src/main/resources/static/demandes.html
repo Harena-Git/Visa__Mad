@@ -1,288 +1,703 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Demandes - Ministère des Visas</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-</head>
-<body data-page="demandes">
-    <!-- Header -->
-    <header class="header">
-        <h1>
-            <a href="index.html" style="color: white; text-decoration: none;">
-                🏛️ Ministère des Visas
-            </a>
-            <span style="font-size: 0.6rem; opacity: 0.8;">Gestion des Demandes</span>
-        </h1>
-        <nav>
-            <ul class="nav-links">
-                <li><a href="index.html">🏠 Accueil</a></li>
-                <li><a href="visas-transformables.html">🔄 Visas Transformables</a></li>
-                <li><a href="cartes-residence.html">🪪 Cartes de Résidence</a></li>
-                <li><a href="antecedents.html">📜 Antécédents</a></li>
-                <li><a href="demandes.html" class="active">📋 Demandes</a></li>
-            </ul>
-        </nav>
-    </header>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Gestion des Demandes - Ministère des Visas</title>
+        <link rel="stylesheet" href="css/style.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body data-page="demandes">
+        <!-- Header -->
+        <header class="header">
+            <h1>
+                <a
+                    href="index.html"
+                    style="color: white; text-decoration: none"
+                >
+                    🏛️ Ministère des Visas
+                </a>
+                <span style="font-size: 0.6rem; opacity: 0.8"
+                    >Gestion des Demandes</span
+                >
+            </h1>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">🏠 Accueil</a></li>
+                    <li>
+                        <a href="visas-transformables.html"
+                            >🔄 Visas Transformables</a
+                        >
+                    </li>
+                    <li>
+                        <a href="cartes-residence.html"
+                            >🪪 Cartes de Résidence</a
+                        >
+                    </li>
+                    <li><a href="antecedents.html">📜 Antécédents</a></li>
+                    <li>
+                        <a href="demandes.html" class="active">📋 Demandes</a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
 
-    <!-- Main Content -->
-    <main class="main-container">
-        <!-- Search and Actions -->
-        <section class="search-container">
-            <div class="search-filters">
-                <input type="text" id="searchInput" class="search-input" placeholder="Rechercher par demandeur, type de visa...">
-                <select id="categorieFilter" class="search-input">
-                    <option value="">Toutes les catégories</option>
-                </select>
-                <select id="typeVisaFilter" class="search-input">
-                    <option value="">Tous les types de visa</option>
-                </select>
-                <input type="date" id="dateDebutFilter" class="search-input" placeholder="Date début">
-                <input type="date" id="dateFinFilter" class="search-input" placeholder="Date fin">
-                <button class="btn btn-primary" onclick="demandeManager.searchDemandes()">🔍 Rechercher</button>
-                <button class="btn btn-success" onclick="demandeManager.showDemandeForm()">➕ Ajouter</button>
-            </div>
-        </section>
-
-        <!-- Alert Container -->
-        <div id="alertContainer"></div>
-
-        <!-- Statistics Cards -->
-        <section class="stats-container">
-            <div class="stat-card">
-                <h3>📊 Total Demandes</h3>
-                <p id="totalDemandes">-</p>
-            </div>
-            <div class="stat-card">
-                <h3>📅 Demandes Aujourd'hui</h3>
-                <p id="todayDemandes">-</p>
-            </div>
-            <div class="stat-card">
-                <h3>⏳ En Attente</h3>
-                <p id="pendingDemandes">-</p>
-            </div>
-            <div class="stat-card">
-                <h3>✅ Traitées</h3>
-                <p id="processedDemandes">-</p>
-            </div>
-        </section>
-
-        <!-- Table demande -->
-        <section class="table-container">
-            <table class="table" id="demandesTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Demandeur</th>
-                        <th>Type Visa</th>
-                        <th>Catégorie</th>
-                        <th>Date Création</th>
-                        <th>Date Mise à Jour</th>
-                        <th>Statut</th>
-                        <th>Actions</th>
-                        <th>Fichiers & Scan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="9" class="text-center">
-                            <div class="loading"></div>
-                            <p>Chargement des demandes...</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <!-- Pagination -->
-        <section class="pagination-container">
-            <div class="pagination">
-                <button class="btn btn-secondary" onclick="demandeManager.previousPage()" id="prevBtn">⬅ Précédent</button>
-                <span id="pageInfo">Page 1 sur 1</span>
-                <button class="btn btn-secondary" onclick="demandeManager.nextPage()" id="nextBtn">Suivant ➡</button>
-            </div>
-        </section>
-    </main>
-
-    <!-- Modal Demande -->
-    <div id="demandeModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modalTitle">Ajouter une Demande</h2>
-                <button class="close-btn" onclick="demandeManager.closeModal()">&times;</button>
-            </div>
-            <form id="demandeForm" onsubmit="event.preventDefault(); demandeManager.submitForm();">
-                <div class="form-group">
-                    <label for="categorie">Catégorie *</label>
-                    <select id="categorie" name="categorie" required>
-                        <option value="">Sélectionner...</option>
+        <!-- Main Content -->
+        <main class="main-container">
+            <!-- Search and Actions -->
+            <section class="search-container">
+                <div class="search-filters">
+                    <input
+                        type="text"
+                        id="searchInput"
+                        class="search-input"
+                        placeholder="Rechercher par demandeur, type de visa..."
+                    />
+                    <select id="categorieFilter" class="search-input">
+                        <option value="">Toutes les catégories</option>
                     </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="typeVisa">Type de Visa *</label>
-                    <select id="typeVisa" name="typeVisa" required>
-                        <option value="">Sélectionner...</option>
+                    <select id="typeVisaFilter" class="search-input">
+                        <option value="">Tous les types de visa</option>
                     </select>
+                    <input
+                        type="date"
+                        id="dateDebutFilter"
+                        class="search-input"
+                        placeholder="Date début"
+                    />
+                    <input
+                        type="date"
+                        id="dateFinFilter"
+                        class="search-input"
+                        placeholder="Date fin"
+                    />
+                    <button
+                        class="btn btn-primary"
+                        onclick="demandeManager.searchDemandes()"
+                    >
+                        🔍 Rechercher
+                    </button>
+                    <button
+                        class="btn btn-success"
+                        onclick="demandeManager.showDemandeForm()"
+                    >
+                        ➕ Ajouter
+                    </button>
                 </div>
-                
-                <div class="form-group">
-                    <label for="demandeur">Demandeur *</label>
-                    <select id="demandeur" name="demandeur" required>
-                        <option value="">Sélectionner...</option>
-                    </select>
+            </section>
+
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Statistics Cards -->
+            <section class="stats-container">
+                <div class="stat-card">
+                    <h3>📊 Total Demandes</h3>
+                    <p id="totalDemandes">-</p>
                 </div>
-                
-                <div class="form-group">
-                    <label for="dateDemande">Date de la Demande</label>
-                    <input type="date" id="dateDemande" name="dateDemande">
+                <div class="stat-card">
+                    <h3>📅 Demandes Aujourd'hui</h3>
+                    <p id="todayDemandes">-</p>
                 </div>
-                
-                <div class="form-group">
-                    <label for="observations">Observations</label>
-                    <textarea id="observations" name="observations" rows="4" placeholder="Ajouter des observations ou commentaires..."></textarea>
+                <div class="stat-card">
+                    <h3>⏳ En Attente</h3>
+                    <p id="pendingDemandes">-</p>
                 </div>
-                
-                <div class="form-group text-center">
-                    <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
-                    <button type="button" class="btn btn-secondary" onclick="demandeManager.closeModal()">❌ Annuler</button>
+                <div class="stat-card">
+                    <h3>✅ Traitées</h3>
+                    <p id="processedDemandes">-</p>
                 </div>
-            </form>
+            </section>
+
+            <!-- Table demande -->
+            <section class="table-container">
+                <table class="table" id="demandesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Demandeur</th>
+                            <th>Type Visa</th>
+                            <th>Catégorie</th>
+                            <th>Date Création</th>
+                            <th>Date Mise à Jour</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                            <th>Fichiers & Scan</th>
+                            <th>Photo & Signature</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="10" class="text-center">
+                                <div class="loading"></div>
+                                <p>Chargement des demandes...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Pagination -->
+            <section class="pagination-container">
+                <div class="pagination">
+                    <button
+                        class="btn btn-secondary"
+                        onclick="demandeManager.previousPage()"
+                        id="prevBtn"
+                    >
+                        ⬅ Précédent
+                    </button>
+                    <span id="pageInfo">Page 1 sur 1</span>
+                    <button
+                        class="btn btn-secondary"
+                        onclick="demandeManager.nextPage()"
+                        id="nextBtn"
+                    >
+                        Suivant ➡
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modal Demande -->
+        <div id="demandeModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modalTitle">
+                        Ajouter une Demande
+                    </h2>
+                    <button
+                        class="close-btn"
+                        onclick="demandeManager.closeModal()"
+                    >
+                        &times;
+                    </button>
+                </div>
+                <form
+                    id="demandeForm"
+                    onsubmit="
+                        event.preventDefault();
+                        demandeManager.submitForm();
+                    "
+                >
+                    <div class="form-group">
+                        <label for="categorie">Catégorie *</label>
+                        <select id="categorie" name="categorie" required>
+                            <option value="">Sélectionner...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="typeVisa">Type de Visa *</label>
+                        <select id="typeVisa" name="typeVisa" required>
+                            <option value="">Sélectionner...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="demandeur">Demandeur *</label>
+                        <select id="demandeur" name="demandeur" required>
+                            <option value="">Sélectionner...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dateDemande">Date de la Demande</label>
+                        <input
+                            type="date"
+                            id="dateDemande"
+                            name="dateDemande"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="observations">Observations</label>
+                        <textarea
+                            id="observations"
+                            name="observations"
+                            rows="4"
+                            placeholder="Ajouter des observations ou commentaires..."
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group text-center">
+                        <button type="submit" class="btn btn-primary">
+                            💾 Enregistrer
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            onclick="demandeManager.closeModal()"
+                        >
+                            ❌ Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <!-- Input file caché pour upload -->
-    <input type="file" id="fileInputHidden" style="display: none;" onchange="demandeManager.handleFileSelected()">
+        <!-- SPRINT 5: Modal Photo & Signature -->
+        <div id="photoSignatureModal" class="modal" style="display: none">
+            <div class="modal-content" style="max-width: 900px; width: 95vw">
+                <div class="modal-header">
+                    <h2 class="modal-title">
+                        📸 Photo &amp; Signature du Demandeur
+                    </h2>
+                    <button
+                        class="close-btn"
+                        onclick="demandeManager.closePhotoSignatureModal()"
+                    >
+                        &times;
+                    </button>
+                </div>
+                <div
+                    style="
+                        display: flex;
+                        gap: 2rem;
+                        flex-wrap: wrap;
+                        padding: 1rem;
+                    "
+                >
+                    <!-- Section Photo -->
+                    <div style="flex: 1; min-width: 300px">
+                        <h3
+                            style="
+                                color: var(--primary-color);
+                                margin-bottom: 1rem;
+                            "
+                        >
+                            📷 Photo (Webcam)
+                        </h3>
 
-    <script src="js/app.js"></script>
-    <script>
-        // Étendre le demandeManager avec les fonctionnalités de recherche et pagination
-        demandeManager.currentPage = 1;
-        demandeManager.pageSize = 10;
-        demandeManager.totalPages = 1;
+                        <div
+                            id="webcamContainer"
+                            style="
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                gap: 0.5rem;
+                            "
+                        >
+                            <video
+                                id="webcamVideo"
+                                width="300"
+                                height="225"
+                                autoplay
+                                playsinline
+                                style="
+                                    border: 2px solid #ddd;
+                                    border-radius: 8px;
+                                    background: #000;
+                                    display: none;
+                                "
+                            ></video>
+                            <canvas
+                                id="photoCanvas"
+                                width="300"
+                                height="225"
+                                style="
+                                    border: 2px solid #ddd;
+                                    border-radius: 8px;
+                                    display: none;
+                                "
+                            ></canvas>
+                            <div
+                                id="photoPlaceholder"
+                                style="
+                                    width: 300px;
+                                    height: 225px;
+                                    border: 2px dashed #ccc;
+                                    border-radius: 8px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    background: #f9f9f9;
+                                "
+                            >
+                                <span style="color: #999; font-size: 3rem"
+                                    >📷</span
+                                >
+                            </div>
 
-        // Fonction de recherche
-        demandeManager.searchDemandes = async function() {
-            const searchTerm = document.getElementById('searchInput').value;
-            const categorie = document.getElementById('categorieFilter').value;
-            const typeVisa = document.getElementById('typeVisaFilter').value;
-            const dateDebut = document.getElementById('dateDebutFilter').value;
-            const dateFin = document.getElementById('dateFinFilter').value;
+                            <div
+                                style="
+                                    display: flex;
+                                    gap: 0.5rem;
+                                    flex-wrap: wrap;
+                                    justify-content: center;
+                                    margin-top: 0.5rem;
+                                "
+                            >
+                                <button
+                                    class="btn btn-primary btn-sm"
+                                    id="startWebcamBtn"
+                                    onclick="demandeManager.startWebcam()"
+                                >
+                                    🎥 Activer Webcam
+                                </button>
+                                <button
+                                    class="btn btn-success btn-sm"
+                                    id="capturePhotoBtn"
+                                    onclick="demandeManager.capturePhoto()"
+                                    disabled
+                                    style="display: none"
+                                >
+                                    📸 Capturer
+                                </button>
+                                <button
+                                    class="btn btn-warning btn-sm"
+                                    id="retakePhotoBtn"
+                                    onclick="demandeManager.retakePhoto()"
+                                    style="display: none"
+                                >
+                                    🔄 Reprendre
+                                </button>
+                            </div>
+                            <div
+                                id="photoStatus"
+                                style="
+                                    font-size: 0.85rem;
+                                    color: #666;
+                                    margin-top: 0.3rem;
+                                "
+                            ></div>
+                        </div>
+                    </div>
 
-            try {
-                let url;
-                if (categorie) {
-                    url = `/demandes/categorie/${categorie}`;
-                } else if (typeVisa) {
-                    url = `/demandes/type-visa/${typeVisa}`;
-                } else if (dateDebut && dateFin) {
-                    url = `/demandes/date-range?startDate=${dateDebut}&endDate=${dateFin}`;
-                } else {
-                    url = '/demandes';
+                    <!-- Section Signature -->
+                    <div style="flex: 1; min-width: 300px">
+                        <h3
+                            style="
+                                color: var(--primary-color);
+                                margin-bottom: 1rem;
+                            "
+                        >
+                            ✍️ Signature (Souris / Trackpad)
+                        </h3>
+
+                        <div
+                            style="
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                gap: 0.5rem;
+                            "
+                        >
+                            <canvas
+                                id="signatureCanvas"
+                                width="380"
+                                height="180"
+                                style="
+                                    border: 2px solid #333;
+                                    border-radius: 8px;
+                                    cursor: crosshair;
+                                    background: white;
+                                    touch-action: none;
+                                "
+                            ></canvas>
+
+                            <div
+                                style="
+                                    display: flex;
+                                    gap: 0.5rem;
+                                    flex-wrap: wrap;
+                                    justify-content: center;
+                                    margin-top: 0.5rem;
+                                "
+                            >
+                                <button
+                                    class="btn btn-danger btn-sm"
+                                    onclick="demandeManager.clearSignature()"
+                                >
+                                    🗑️ Effacer
+                                </button>
+                                <select
+                                    id="signatureColor"
+                                    class="search-input btn-sm"
+                                    style="min-width: 80px; padding: 0.3rem"
+                                    onchange="
+                                        demandeManager.changeSignatureColor()
+                                    "
+                                >
+                                    <option value="#000000">Noir</option>
+                                    <option value="#003366">Bleu foncé</option>
+                                    <option value="#8B0000">Rouge foncé</option>
+                                </select>
+                            </div>
+                            <div
+                                id="signatureStatus"
+                                style="
+                                    font-size: 0.85rem;
+                                    color: #666;
+                                    margin-top: 0.3rem;
+                                "
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aperçu si photo/signature déjà sauvegardées -->
+                <div
+                    id="existingMediaContainer"
+                    style="padding: 0 1rem 0.5rem; display: none"
+                >
+                    <hr />
+                    <p style="color: #666; font-size: 0.9rem">
+                        📂 Données déjà enregistrées :
+                    </p>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap">
+                        <div id="existingPhotoDiv" style="display: none">
+                            <p style="font-size: 0.8rem; font-weight: bold">
+                                Photo :
+                            </p>
+                            <img
+                                id="existingPhotoImg"
+                                style="
+                                    max-width: 150px;
+                                    max-height: 150px;
+                                    border: 1px solid #ddd;
+                                    border-radius: 4px;
+                                "
+                                alt="Photo existante"
+                            />
+                        </div>
+                        <div id="existingSignatureDiv" style="display: none">
+                            <p style="font-size: 0.8rem; font-weight: bold">
+                                Signature :
+                            </p>
+                            <img
+                                id="existingSignatureImg"
+                                style="
+                                    max-width: 200px;
+                                    max-height: 80px;
+                                    border: 1px solid #ddd;
+                                    border-radius: 4px;
+                                "
+                                alt="Signature existante"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    style="
+                        padding: 1rem;
+                        border-top: 1px solid #eee;
+                        display: flex;
+                        gap: 1rem;
+                        justify-content: center;
+                    "
+                >
+                    <button
+                        class="btn btn-primary"
+                        onclick="demandeManager.savePhotoAndSignature()"
+                    >
+                        💾 Enregistrer Photo &amp; Signature
+                    </button>
+                    <button
+                        class="btn btn-secondary"
+                        onclick="demandeManager.closePhotoSignatureModal()"
+                    >
+                        ❌ Annuler
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input file caché pour upload -->
+        <input
+            type="file"
+            id="fileInputHidden"
+            style="display: none"
+            onchange="demandeManager.handleFileSelected()"
+        />
+
+        <script src="js/app.js"></script>
+        <script>
+            // Étendre le demandeManager avec les fonctionnalités de recherche et pagination
+            demandeManager.currentPage = 1;
+            demandeManager.pageSize = 10;
+            demandeManager.totalPages = 1;
+
+            // Fonction de recherche
+            demandeManager.searchDemandes = async function () {
+                const searchTerm = document.getElementById("searchInput").value;
+                const categorie =
+                    document.getElementById("categorieFilter").value;
+                const typeVisa =
+                    document.getElementById("typeVisaFilter").value;
+                const dateDebut =
+                    document.getElementById("dateDebutFilter").value;
+                const dateFin = document.getElementById("dateFinFilter").value;
+
+                try {
+                    let url;
+                    if (categorie) {
+                        url = `/demandes/categorie/${categorie}`;
+                    } else if (typeVisa) {
+                        url = `/demandes/type-visa/${typeVisa}`;
+                    } else if (dateDebut && dateFin) {
+                        url = `/demandes/date-range?startDate=${dateDebut}&endDate=${dateFin}`;
+                    } else {
+                        url = "/demandes";
+                    }
+
+                    const demandes = await utils.apiRequest(url);
+                    this.displayDemandes(demandes);
+                } catch (error) {
+                    utils.showAlert("Erreur lors de la recherche", "danger");
                 }
+            };
 
-                const demandes = await utils.apiRequest(url);
-                this.displayDemandes(demandes);
-            } catch (error) {
-                utils.showAlert('Erreur lors de la recherche', 'danger');
-            }
-        };
+            // Gestion de la pagination
+            demandeManager.updatePagination = function () {
+                const pageInfo = document.getElementById("pageInfo");
+                const prevBtn = document.getElementById("prevBtn");
+                const nextBtn = document.getElementById("nextBtn");
 
-        // Gestion de la pagination
-        demandeManager.updatePagination = function() {
-            const pageInfo = document.getElementById('pageInfo');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            
-            pageInfo.textContent = `Page ${this.currentPage} sur ${this.totalPages}`;
-            prevBtn.disabled = this.currentPage <= 1;
-            nextBtn.disabled = this.currentPage >= this.totalPages;
-        };
+                pageInfo.textContent = `Page ${this.currentPage} sur ${this.totalPages}`;
+                prevBtn.disabled = this.currentPage <= 1;
+                nextBtn.disabled = this.currentPage >= this.totalPages;
+            };
 
-        demandeManager.previousPage = function() {
-            if (this.currentPage > 1) {
-                this.currentPage--;
-                this.loadDemandes();
-            }
-        };
+            demandeManager.previousPage = function () {
+                if (this.currentPage > 1) {
+                    this.currentPage--;
+                    this.loadDemandes();
+                }
+            };
 
-        demandeManager.nextPage = function() {
-            if (this.currentPage < this.totalPages) {
-                this.currentPage++;
-                this.loadDemandes();
-            }
-        };
+            demandeManager.nextPage = function () {
+                if (this.currentPage < this.totalPages) {
+                    this.currentPage++;
+                    this.loadDemandes();
+                }
+            };
 
-        // JS demande 
-        // Améliorer la fonction displayDemandes pour la pagination et statuts
-        const originalDisplayDemandes = demandeManager.displayDemandes;
-        demandeManager.displayDemandes = function(demandes) {
-            const tbody = document.querySelector('#demandesTable tbody');
-            if (!tbody) return;
-            
-            tbody.innerHTML = '';
-            
-            if (demandes.length === 0) {
-                tbody.innerHTML = `
+            // JS demande
+            // Améliorer la fonction displayDemandes pour la pagination et statuts
+            const originalDisplayDemandes = demandeManager.displayDemandes;
+            demandeManager.displayDemandes = function (demandes) {
+                const tbody = document.querySelector("#demandesTable tbody");
+                if (!tbody) return;
+
+                tbody.innerHTML = "";
+
+                if (demandes.length === 0) {
+                    tbody.innerHTML = `
                     <tr>
-                        <td colspan="9" class="text-center">
+                        <td colspan="10" class="text-center">
                             <p>Aucune demande trouvée</p>
                         </td>
                     </tr>
                 `;
-                return;
-            }
-            
-            const startIndex = (this.currentPage - 1) * this.pageSize;
-            const endIndex = Math.min(startIndex + this.pageSize, demandes.length);
-            const pageData = demandes.slice(startIndex, endIndex);
-            
-            pageData.forEach(demande => {
-                const row = document.createElement('tr');
-                const statutBadge = this.getStatutBadge(demande);
-                
-                // ⭐ Vérifier si la demande est verrouillée (SCAN_TERMINE)
-                // Vérifier dans les statuts de la demande
-                const isVerrouille = demande.statutDemandes && 
-                    demande.statutDemandes.some(s => s.statut && s.statut.id === 'SCAN_TERMINE');
-                
-                // ⭐ Vérifier si la demande a déjà un fichier uploadé
-                const hasFile = demande.checkPieces && 
-                    demande.checkPieces.some(cp => cp.fileName !== null && cp.fileName !== undefined && cp.fileName.trim() !== '');
-                
-                // ========== BOUTON MODIFIER ==========
-                const modifierDisabled = isVerrouille ? 'disabled' : '';
-                const modifierClass = isVerrouille ? 'btn-secondary' : 'btn-warning';
-                const modifierTitle = isVerrouille ? 'Demande verrouillée (non modifiable)' : '';
-                
-                // ========== BOUTON SUPPRIMER ==========
-                // Toujours actif
-                const supprimerDisabled = '';
-                const supprimerClass = 'btn-danger';
-                
-                // ========== BOUTON IMPORTER ==========
-                // Désactivé si demande verrouillée OU si fichier existe déjà
-                const importerDisabled = (isVerrouille || hasFile) ? 'disabled' : '';
-                const importerClass = (isVerrouille || hasFile) ? 'btn-secondary' : 'btn-info';
-                const importerTitle = isVerrouille ? 'Demande verrouillée' : 
-                                     hasFile ? 'Un fichier est déjà uploadé' : 'Importer un fichier pour cette demande';
-                
-                // ========== BOUTON TERMINER SCANN ==========
-                // Désactivé si demande verrouillée OU si pas de fichier
-                const scanTermineDisabled = (isVerrouille || !hasFile) ? 'disabled' : '';
-                const scanTermineClass = (isVerrouille || !hasFile) ? 'btn-secondary' : 'btn-success';
-                const scanTermineTitle = isVerrouille ? 'Déjà verrouillée' : 
-                                        !hasFile ? 'Importez un fichier d\'abord' : '';
-                
-                row.innerHTML = `
-                    <td>${demande.id || ''}</td>
-                    <td>${demande.demandeur?.nom || ''} ${demande.demandeur?.prenom || ''}</td>
-                    <td>${demande.typeVisa?.libelle || ''}</td>
-                    <td>${demande.categorie?.libelle || ''}</td>
+                    return;
+                }
+
+                const startIndex = (this.currentPage - 1) * this.pageSize;
+                const endIndex = Math.min(
+                    startIndex + this.pageSize,
+                    demandes.length,
+                );
+                const pageData = demandes.slice(startIndex, endIndex);
+
+                pageData.forEach((demande) => {
+                    const row = document.createElement("tr");
+                    const statutBadge = this.getStatutBadge(demande);
+
+                    // ⭐ Vérifier si la demande est verrouillée (SCAN_TERMINE)
+                    // Vérifier dans les statuts de la demande
+                    const isVerrouille =
+                        demande.statutDemandes &&
+                        demande.statutDemandes.some(
+                            (s) => s.statut && s.statut.id === "SCAN_TERMINE",
+                        );
+
+                    // ⭐ Vérifier si la demande a déjà un fichier uploadé
+                    const hasFile =
+                        demande.checkPieces &&
+                        demande.checkPieces.some(
+                            (cp) =>
+                                cp.fileName !== null &&
+                                cp.fileName !== undefined &&
+                                cp.fileName.trim() !== "",
+                        );
+
+                    // ========== BOUTON MODIFIER ==========
+                    const modifierDisabled = isVerrouille ? "disabled" : "";
+                    const modifierClass = isVerrouille
+                        ? "btn-secondary"
+                        : "btn-warning";
+                    const modifierTitle = isVerrouille
+                        ? "Demande verrouillée (non modifiable)"
+                        : "";
+
+                    // ========== BOUTON SUPPRIMER ==========
+                    // Toujours actif
+                    const supprimerDisabled = "";
+                    const supprimerClass = "btn-danger";
+
+                    // ========== BOUTON IMPORTER ==========
+                    // Désactivé si demande verrouillée OU si fichier existe déjà
+                    const importerDisabled =
+                        isVerrouille || hasFile ? "disabled" : "";
+                    const importerClass =
+                        isVerrouille || hasFile ? "btn-secondary" : "btn-info";
+                    const importerTitle = isVerrouille
+                        ? "Demande verrouillée"
+                        : hasFile
+                          ? "Un fichier est déjà uploadé"
+                          : "Importer un fichier pour cette demande";
+
+                    // ========== SPRINT 5: PHOTO & SIGNATURE ==========
+                    const hasPhoto =
+                        demande.photoPath != null && demande.photoPath !== "";
+                    const hasSignature =
+                        demande.signaturePath != null &&
+                        demande.signaturePath !== "";
+                    const photoSigDisabled = isVerrouille ? "disabled" : "";
+                    const photoSigClass = isVerrouille
+                        ? "btn-secondary"
+                        : hasPhoto && hasSignature
+                          ? "btn-success"
+                          : "btn-warning";
+                    const photoSigTitle = isVerrouille
+                        ? "Demande verrouillée"
+                        : hasPhoto && hasSignature
+                          ? "Photo et signature déjà enregistrées"
+                          : "Ajouter photo et signature";
+                    const photoSigIcon = hasPhoto && hasSignature ? "✅" : "📸";
+
+                    // ========== BOUTON TERMINER SCANN ==========
+                    // Désactivé si demande verrouillée OU si pas de fichier/photo/signature
+                    const scanTermineDisabled =
+                        isVerrouille || !hasFile || !hasPhoto || !hasSignature
+                            ? "disabled"
+                            : "";
+                    const scanTermineClass =
+                        isVerrouille || !hasFile || !hasPhoto || !hasSignature
+                            ? "btn-secondary"
+                            : "btn-success";
+                    const scanTermineTitle = isVerrouille
+                        ? "Déjà verrouillée"
+                        : !hasFile
+                          ? "Importez un fichier d'abord"
+                          : !hasPhoto
+                            ? "Ajoutez la photo du demandeur d'abord"
+                            : !hasSignature
+                              ? "Ajoutez la signature du demandeur d'abord"
+                              : "";
+
+                    row.innerHTML = `
+                    <td>${demande.id || ""}</td>
+                    <td>${demande.demandeur?.nom || ""} ${demande.demandeur?.prenom || ""}</td>
+                    <td>${demande.typeVisa?.libelle || ""}</td>
+                    <td>${demande.categorie?.libelle || ""}</td>
                     <td>${utils.formatDate(demande.createdAt)}</td>
                     <td>${utils.formatDate(demande.updatedAt)}</td>
                     <td>${statutBadge}</td>
@@ -298,320 +713,938 @@
                             <button class="btn ${scanTermineClass} btn-sm" onclick="demandeManager.terminerScanDemande('${demande.id}')" ${scanTermineDisabled} title="${scanTermineTitle}">🔒 Terminer Scann</button>
                         </div>
                     </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn ${photoSigClass} btn-sm" onclick="demandeManager.openPhotoSignatureModal('${demande.id}')" ${photoSigDisabled} title="${photoSigTitle}">${photoSigIcon} Photo & Sig.</button>
+                        </div>
+                    </td>
                 `;
-                tbody.appendChild(row);
-            });
-            
-            this.totalPages = Math.ceil(demandes.length / this.pageSize);
-            this.updatePagination();
-        };
-
-        // Obtenir le badge de statut (à adapter selon votre logique métier)
-        demandeManager.getStatutBadge = function(demande) {
-            // Simuler un statut basé sur la date de mise à jour
-            const daysSinceUpdate = Math.floor((new Date() - new Date(demande.updatedAt || demande.createdAt)) / (1000 * 60 * 60 * 24));
-            
-            if (daysSinceUpdate <= 1) {
-                return '<span class="badge badge-success">Nouveau</span>';
-            } else if (daysSinceUpdate <= 7) {
-                return '<span class="badge badge-warning">En cours</span>';
-            } else {
-                return '<span class="badge badge-info">Traité</span>';
-            }
-        };
-
-        // Charger les statistiques
-        demandeManager.loadStats = async function() {
-            try {
-                const [totalResponse, todayResponse] = await Promise.all([
-                    utils.apiRequest('/demandes/count'),
-                    utils.apiRequest(`/demandes/date-range?startDate=${new Date().toISOString().split('T')[0]}&endDate=${new Date().toISOString().split('T')[0]}`)
-                ]);
-
-                document.getElementById('totalDemandes').textContent = totalResponse.count || 0;
-                document.getElementById('todayDemandes').textContent = todayResponse.length || 0;
-                
-                // Simuler les statistiques (à adapter selon votre logique métier)
-                document.getElementById('pendingDemandes').textContent = Math.floor((totalResponse.count || 0) * 0.3);
-                document.getElementById('processedDemandes').textContent = Math.floor((totalResponse.count || 0) * 0.7);
-
-            } catch (error) {
-                console.error('Erreur lors du chargement des statistiques:', error);
-            }
-        };
-
-        // Améliorer la fonction loadReferenceData
-        const originalLoadReferenceData = demandeManager.loadReferenceData;
-        demandeManager.loadReferenceData = async function() {
-            await originalLoadReferenceData.call(this);
-            
-            // Remplir les filtres
-            const categorieFilter = document.getElementById('categorieFilter');
-            const typeVisaFilter = document.getElementById('typeVisaFilter');
-            
-            if (categorieFilter) {
-                const categories = await utils.apiRequest('/categories-demande');
-                categorieFilter.innerHTML = '<option value="">Toutes les catégories</option>';
-                categories.forEach(cat => {
-                    const option = document.createElement('option');
-                    option.value = cat.id;
-                    option.textContent = cat.libelle;
-                    categorieFilter.appendChild(option);
-                });
-            }
-            
-            if (typeVisaFilter) {
-                const typesVisa = await utils.apiRequest('/types-visa');
-                typeVisaFilter.innerHTML = '<option value="">Tous les types de visa</option>';
-                typesVisa.forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type.id;
-                    option.textContent = type.libelle;
-                    typeVisaFilter.appendChild(option);
-                });
-            }
-        };
-
-        // Améliorer la fonction submitForm
-        const originalSubmitForm = demandeManager.submitForm;
-        demandeManager.submitForm = async function() {
-            const form = document.getElementById('demandeForm');
-            
-            // Validation basique
-            const categorie = form.categorie.value;
-            const typeVisa = form.typeVisa.value;
-            const demandeur = form.demandeur.value;
-            
-            if (!categorie || !typeVisa || !demandeur) {
-                utils.showAlert('Veuillez remplir tous les champs obligatoires', 'warning');
-                return;
-            }
-            
-            await originalSubmitForm.call(this);
-        };
-
-        // ============= SPRINT 3 SIMPLIFIÉ: UPLOAD + VERROUILLAGE =============
-        
-        // FONCTION 1: Ouvrir dialogue d'upload fichier
-        demandeManager.uploadFileDemande = function(demandeId) {
-            // Chercher la demande pour vérifier son état
-            const demande = demandeManager.allDemandes.find(d => d.id === demandeId);
-            
-            if (!demande) {
-                utils.showAlert('❌ Demande non trouvée', 'danger');
-                return;
-            }
-            
-            // Vérifier si déjà verrouillée
-            const isVerrouille = demande.statutDemandes && 
-                demande.statutDemandes.some(s => s.statut && s.statut.id === 'SCAN_TERMINE');
-            
-            if (isVerrouille) {
-                utils.showAlert('❌ Cette demande est verrouillée et ne peut pas être modifiée', 'danger');
-                return;
-            }
-            
-            // Vérifier si fichier existe déjà
-            const hasFile = demande.checkPieces && 
-                demande.checkPieces.some(cp => cp.fileName !== null && cp.fileName !== undefined && cp.fileName.trim() !== '');
-            
-            if (hasFile) {
-                utils.showAlert('⚠️ Un fichier est déjà uploadé pour cette demande', 'warning');
-                return;
-            }
-            
-            // Stocker l'ID de la demande pour l'utiliser dans handleFileSelected
-            demandeManager.currentDemandeIdForUpload = demandeId;
-            // Déclencher le dialogue de sélection de fichier
-            document.getElementById('fileInputHidden').click();
-        };
-
-        // FONCTION 2: Gérer le fichier sélectionné
-        demandeManager.handleFileSelected = async function() {
-            const fileInput = document.getElementById('fileInputHidden');
-            const file = fileInput.files[0];
-            if (!file) return;
-
-            const demandeId = demandeManager.currentDemandeIdForUpload;
-
-            try {
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('idDemande', demandeId);
-
-                // Appel API pour uploader le fichier
-                const response = await fetch('/visa-backoffice/api/demandes/' + demandeId + '/upload-fichier', {
-                    method: 'POST',
-                    body: formData
+                    tbody.appendChild(row);
                 });
 
-                if (!response.ok) {
-                    throw new Error('Erreur lors de l\'upload');
+                this.totalPages = Math.ceil(demandes.length / this.pageSize);
+                this.updatePagination();
+            };
+
+            // Obtenir le badge de statut (à adapter selon votre logique métier)
+            demandeManager.getStatutBadge = function (demande) {
+                // Simuler un statut basé sur la date de mise à jour
+                const daysSinceUpdate = Math.floor(
+                    (new Date() -
+                        new Date(demande.updatedAt || demande.createdAt)) /
+                        (1000 * 60 * 60 * 24),
+                );
+
+                if (daysSinceUpdate <= 1) {
+                    return '<span class="badge badge-success">Nouveau</span>';
+                } else if (daysSinceUpdate <= 7) {
+                    return '<span class="badge badge-warning">En cours</span>';
+                } else {
+                    return '<span class="badge badge-info">Traité</span>';
+                }
+            };
+
+            // Charger les statistiques
+            demandeManager.loadStats = async function () {
+                try {
+                    const [totalResponse, todayResponse] = await Promise.all([
+                        utils.apiRequest("/demandes/count"),
+                        utils.apiRequest(
+                            `/demandes/date-range?startDate=${new Date().toISOString().split("T")[0]}&endDate=${new Date().toISOString().split("T")[0]}`,
+                        ),
+                    ]);
+
+                    document.getElementById("totalDemandes").textContent =
+                        totalResponse.count || 0;
+                    document.getElementById("todayDemandes").textContent =
+                        todayResponse.length || 0;
+
+                    // Simuler les statistiques (à adapter selon votre logique métier)
+                    document.getElementById("pendingDemandes").textContent =
+                        Math.floor((totalResponse.count || 0) * 0.3);
+                    document.getElementById("processedDemandes").textContent =
+                        Math.floor((totalResponse.count || 0) * 0.7);
+                } catch (error) {
+                    console.error(
+                        "Erreur lors du chargement des statistiques:",
+                        error,
+                    );
+                }
+            };
+
+            // Améliorer la fonction loadReferenceData
+            const originalLoadReferenceData = demandeManager.loadReferenceData;
+            demandeManager.loadReferenceData = async function () {
+                await originalLoadReferenceData.call(this);
+
+                // Remplir les filtres
+                const categorieFilter =
+                    document.getElementById("categorieFilter");
+                const typeVisaFilter =
+                    document.getElementById("typeVisaFilter");
+
+                if (categorieFilter) {
+                    const categories = await utils.apiRequest(
+                        "/categories-demande",
+                    );
+                    categorieFilter.innerHTML =
+                        '<option value="">Toutes les catégories</option>';
+                    categories.forEach((cat) => {
+                        const option = document.createElement("option");
+                        option.value = cat.id;
+                        option.textContent = cat.libelle;
+                        categorieFilter.appendChild(option);
+                    });
                 }
 
-                utils.showAlert('✅ Fichier uploadé avec succès', 'success');
-                
-                // Recharger les demandes
-                demandeManager.loadDemandes();
+                if (typeVisaFilter) {
+                    const typesVisa = await utils.apiRequest("/types-visa");
+                    typeVisaFilter.innerHTML =
+                        '<option value="">Tous les types de visa</option>';
+                    typesVisa.forEach((type) => {
+                        const option = document.createElement("option");
+                        option.value = type.id;
+                        option.textContent = type.libelle;
+                        typeVisaFilter.appendChild(option);
+                    });
+                }
+            };
 
-            } catch (error) {
-                console.error('Erreur upload:', error);
-                utils.showAlert('❌ Erreur lors de l\'upload du fichier', 'danger');
-            }
+            // Améliorer la fonction submitForm
+            const originalSubmitForm = demandeManager.submitForm;
+            demandeManager.submitForm = async function () {
+                const form = document.getElementById("demandeForm");
 
-            // Réinitialiser l'input
-            fileInput.value = '';
-        };
+                // Validation basique
+                const categorie = form.categorie.value;
+                const typeVisa = form.typeVisa.value;
+                const demandeur = form.demandeur.value;
 
-        // FONCTION 3: Verrouiller la demande (TERMINER SCANN)
-        demandeManager.terminerScanDemande = async function(demandeId) {
-            // Chercher la demande
-            const demande = demandeManager.allDemandes.find(d => d.id === demandeId);
-            
-            if (!demande) {
-                utils.showAlert('❌ Demande non trouvée', 'danger');
-                return;
-            }
-            
-            // Vérifier si déjà verrouillée
-            const isVerrouille = demande.statutDemandes && 
-                demande.statutDemandes.some(s => s.statut && s.statut.id === 'SCAN_TERMINE');
-            
-            if (isVerrouille) {
-                utils.showAlert('❌ Cette demande est déjà verrouillée', 'danger');
-                return;
-            }
-            
-            // Vérifier s'il y a un fichier
-            const hasFile = demande.checkPieces && 
-                demande.checkPieces.some(cp => cp.fileName !== null && cp.fileName !== undefined && cp.fileName.trim() !== '');
-            
-            if (!hasFile) {
-                utils.showAlert('❌ Impossible de verrouiller: aucun fichier n\'a été uploadé', 'danger');
-                return;
-            }
-            
-            if (!confirm('Êtes-vous sûr de vouloir verrouiller cette demande ?\n\nElle ne sera plus modifiable.')) {
-                return;
-            }
+                if (!categorie || !typeVisa || !demandeur) {
+                    utils.showAlert(
+                        "Veuillez remplir tous les champs obligatoires",
+                        "warning",
+                    );
+                    return;
+                }
 
-            try {
-                // Appel API pour marquer comme SCAN TERMINÉ
-                const response = await fetch('/visa-backoffice/api/demandes/' + demandeId + '/terminer-scan', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        idStatut: 'SCAN_TERMINE',
-                        date: new Date().toISOString().split('T')[0]
-                    })
+                await originalSubmitForm.call(this);
+            };
+
+            // ============= SPRINT 3 SIMPLIFIÉ: UPLOAD + VERROUILLAGE =============
+
+            // FONCTION 1: Ouvrir dialogue d'upload fichier
+            demandeManager.uploadFileDemande = function (demandeId) {
+                // Chercher la demande pour vérifier son état
+                const demande = demandeManager.allDemandes.find(
+                    (d) => d.id === demandeId,
+                );
+
+                if (!demande) {
+                    utils.showAlert("❌ Demande non trouvée", "danger");
+                    return;
+                }
+
+                // Vérifier si déjà verrouillée
+                const isVerrouille =
+                    demande.statutDemandes &&
+                    demande.statutDemandes.some(
+                        (s) => s.statut && s.statut.id === "SCAN_TERMINE",
+                    );
+
+                if (isVerrouille) {
+                    utils.showAlert(
+                        "❌ Cette demande est verrouillée et ne peut pas être modifiée",
+                        "danger",
+                    );
+                    return;
+                }
+
+                // Vérifier si fichier existe déjà
+                const hasFile =
+                    demande.checkPieces &&
+                    demande.checkPieces.some(
+                        (cp) =>
+                            cp.fileName !== null &&
+                            cp.fileName !== undefined &&
+                            cp.fileName.trim() !== "",
+                    );
+
+                if (hasFile) {
+                    utils.showAlert(
+                        "⚠️ Un fichier est déjà uploadé pour cette demande",
+                        "warning",
+                    );
+                    return;
+                }
+
+                // Stocker l'ID de la demande pour l'utiliser dans handleFileSelected
+                demandeManager.currentDemandeIdForUpload = demandeId;
+                // Déclencher le dialogue de sélection de fichier
+                document.getElementById("fileInputHidden").click();
+            };
+
+            // FONCTION 2: Gérer le fichier sélectionné
+            demandeManager.handleFileSelected = async function () {
+                const fileInput = document.getElementById("fileInputHidden");
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                const demandeId = demandeManager.currentDemandeIdForUpload;
+
+                try {
+                    const formData = new FormData();
+                    formData.append("file", file);
+                    formData.append("idDemande", demandeId);
+
+                    // Appel API pour uploader le fichier
+                    const response = await fetch(
+                        "/visa-backoffice/api/demandes/" +
+                            demandeId +
+                            "/upload-fichier",
+                        {
+                            method: "POST",
+                            body: formData,
+                        },
+                    );
+
+                    if (!response.ok) {
+                        throw new Error("Erreur lors de l'upload");
+                    }
+
+                    utils.showAlert(
+                        "✅ Fichier uploadé avec succès",
+                        "success",
+                    );
+
+                    // Recharger les demandes
+                    demandeManager.loadDemandes();
+                } catch (error) {
+                    console.error("Erreur upload:", error);
+                    utils.showAlert(
+                        "❌ Erreur lors de l'upload du fichier",
+                        "danger",
+                    );
+                }
+
+                // Réinitialiser l'input
+                fileInput.value = "";
+            };
+
+            // FONCTION 3: Verrouiller la demande (TERMINER SCANN)
+            demandeManager.terminerScanDemande = async function (demandeId) {
+                // Chercher la demande
+                const demande = demandeManager.allDemandes.find(
+                    (d) => d.id === demandeId,
+                );
+
+                if (!demande) {
+                    utils.showAlert("❌ Demande non trouvée", "danger");
+                    return;
+                }
+
+                // Vérifier si déjà verrouillée
+                const isVerrouille =
+                    demande.statutDemandes &&
+                    demande.statutDemandes.some(
+                        (s) => s.statut && s.statut.id === "SCAN_TERMINE",
+                    );
+
+                if (isVerrouille) {
+                    utils.showAlert(
+                        "❌ Cette demande est déjà verrouillée",
+                        "danger",
+                    );
+                    return;
+                }
+
+                // Vérifier s'il y a un fichier
+                const hasFile =
+                    demande.checkPieces &&
+                    demande.checkPieces.some(
+                        (cp) =>
+                            cp.fileName !== null &&
+                            cp.fileName !== undefined &&
+                            cp.fileName.trim() !== "",
+                    );
+
+                if (!hasFile) {
+                    utils.showAlert(
+                        "❌ Impossible de verrouiller: aucun fichier n'a été uploadé",
+                        "danger",
+                    );
+                    return;
+                }
+
+                // SPRINT 5: Vérifier photo et signature
+                const hasPhoto =
+                    demande.photoPath != null && demande.photoPath !== "";
+                const hasSignature =
+                    demande.signaturePath != null &&
+                    demande.signaturePath !== "";
+
+                if (!hasPhoto) {
+                    utils.showAlert(
+                        '❌ Impossible de verrouiller: la photo du demandeur est obligatoire. Cliquez sur "📸 Photo & Sig."',
+                        "danger",
+                    );
+                    return;
+                }
+
+                if (!hasSignature) {
+                    utils.showAlert(
+                        '❌ Impossible de verrouiller: la signature du demandeur est obligatoire. Cliquez sur "📸 Photo & Sig."',
+                        "danger",
+                    );
+                    return;
+                }
+
+                if (
+                    !confirm(
+                        "Êtes-vous sûr de vouloir verrouiller cette demande ?\n\nElle ne sera plus modifiable.",
+                    )
+                ) {
+                    return;
+                }
+
+                try {
+                    // Appel API pour marquer comme SCAN TERMINÉ
+                    const response = await fetch(
+                        "/visa-backoffice/api/demandes/" +
+                            demandeId +
+                            "/terminer-scan",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                idStatut: "SCAN_TERMINE",
+                                date: new Date().toISOString().split("T")[0],
+                            }),
+                        },
+                    );
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(
+                            result.error || "Erreur lors du verrouillage",
+                        );
+                    }
+
+                    utils.showAlert(
+                        "✅ Demande verrouillée (SCAN TERMINÉ)",
+                        "success",
+                    );
+
+                    // Recharger les demandes pour mettre à jour l'affichage
+                    await demandeManager.loadDemandes();
+                } catch (error) {
+                    console.error("Erreur verrouillage:", error);
+                    utils.showAlert("❌ " + error.message, "danger");
+                }
+            };
+
+            // FONCTION 4: Éditer une demande
+            demandeManager.editDemande = function (demandeId) {
+                const demande = demandeManager.allDemandes.find(
+                    (d) => d.id === demandeId,
+                );
+
+                if (!demande) {
+                    utils.showAlert("❌ Demande non trouvée", "danger");
+                    return;
+                }
+
+                // Vérifier si verrouillée
+                const isVerrouille =
+                    demande.statutDemandes &&
+                    demande.statutDemandes.some(
+                        (s) => s.statut && s.statut.id === "SCAN_TERMINE",
+                    );
+
+                if (isVerrouille) {
+                    utils.showAlert(
+                        "❌ Cette demande est verrouillée (SCAN TERMINÉ) et ne peut pas être modifiée",
+                        "danger",
+                    );
+                    return;
+                }
+
+                // Ouvrir le formulaire en mode édition
+                const modal = document.getElementById("demandeModal");
+                const form = document.getElementById("demandeForm");
+                const title = document.getElementById("modalTitle");
+
+                if (!modal || !form) return;
+
+                form.reset();
+                title.textContent = "Modifier la Demande #" + demandeId;
+                form.dataset.id = demandeId;
+
+                // Pré-remplir les champs avec les données existantes
+                setTimeout(() => {
+                    document.getElementById("categorie").value =
+                        demande.categorie?.id || "";
+                    document.getElementById("typeVisa").value =
+                        demande.typeVisa?.id || "";
+                    document.getElementById("demandeur").value =
+                        demande.demandeur?.id || "";
+
+                    if (demande.createdAt) {
+                        // The date input expects yyyy-MM-dd format
+                        document.getElementById("dateDemande").value = new Date(
+                            demande.createdAt,
+                        )
+                            .toISOString()
+                            .split("T")[0];
+                    }
+                    document.getElementById("observations").value =
+                        demande.observations || "";
+                }, 100); // setTimeout to ensure dropdowns are populated
+
+                modal.style.display = "block";
+            };
+
+            // FONCTION 5: Supprimer une demande
+            demandeManager.deleteDemande = async function (demandeId) {
+                if (
+                    !confirm(
+                        "Êtes-vous sûr de vouloir supprimer cette demande ?\n\nCette action est irréversible.",
+                    )
+                ) {
+                    return;
+                }
+
+                try {
+                    // Appel API pour supprimer
+                    const response = await fetch(
+                        "/visa-backoffice/api/demandes/" + demandeId,
+                        {
+                            method: "DELETE",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                        },
+                    );
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(
+                            result.message ||
+                                result.error ||
+                                "Erreur lors de la suppression",
+                        );
+                    }
+
+                    utils.showAlert(
+                        "✅ Demande supprimée avec succès",
+                        "success",
+                    );
+
+                    // Recharger les demandes
+                    await demandeManager.loadDemandes();
+                } catch (error) {
+                    console.error("Erreur suppression:", error);
+                    utils.showAlert(
+                        "❌ Erreur lors de la suppression: " + error.message,
+                        "danger",
+                    );
+                }
+            };
+
+            // ============= SPRINT 5: PHOTO & SIGNATURE =============
+            demandeManager.currentDemandeIdForPhotoSig = null;
+            demandeManager.webcamStream = null;
+            demandeManager.photoCaptured = false;
+            demandeManager.signatureHasContent = false;
+
+            // Ouvrir le modal photo/signature
+            demandeManager.openPhotoSignatureModal = function (demandeId) {
+                demandeManager.currentDemandeIdForPhotoSig = demandeId;
+                demandeManager.photoCaptured = false;
+                demandeManager.signatureHasContent = false;
+
+                const modal = document.getElementById("photoSignatureModal");
+                modal.style.display = "block";
+
+                // Réinitialiser l'interface
+                document.getElementById("photoPlaceholder").style.display =
+                    "flex";
+                document.getElementById("webcamVideo").style.display = "none";
+                document.getElementById("photoCanvas").style.display = "none";
+                document.getElementById("startWebcamBtn").style.display =
+                    "inline-block";
+                document.getElementById("capturePhotoBtn").style.display =
+                    "none";
+                document.getElementById("retakePhotoBtn").style.display =
+                    "none";
+                document.getElementById("photoStatus").textContent = "";
+                document.getElementById("signatureStatus").textContent = "";
+
+                // Initialiser le canvas signature
+                demandeManager.initSignatureCanvas();
+
+                // Vérifier si photo/signature déjà enregistrées
+                const demande = demandeManager.allDemandes.find(
+                    (d) => d.id === demandeId,
+                );
+                const existingContainer = document.getElementById(
+                    "existingMediaContainer",
+                );
+                const existingPhotoDiv =
+                    document.getElementById("existingPhotoDiv");
+                const existingSignatureDiv = document.getElementById(
+                    "existingSignatureDiv",
+                );
+
+                if (demande && (demande.photoPath || demande.signaturePath)) {
+                    existingContainer.style.display = "block";
+                    if (demande.photoPath) {
+                        existingPhotoDiv.style.display = "block";
+                        document.getElementById("existingPhotoImg").src =
+                            "/visa-backoffice/api/demandes/" +
+                            demandeId +
+                            "/photo?" +
+                            Date.now();
+                    } else {
+                        existingPhotoDiv.style.display = "none";
+                    }
+                    if (demande.signaturePath) {
+                        existingSignatureDiv.style.display = "block";
+                        document.getElementById("existingSignatureImg").src =
+                            "/visa-backoffice/api/demandes/" +
+                            demandeId +
+                            "/signature?" +
+                            Date.now();
+                    } else {
+                        existingSignatureDiv.style.display = "none";
+                    }
+                } else {
+                    existingContainer.style.display = "none";
+                }
+            };
+
+            // Fermer le modal photo/signature
+            demandeManager.closePhotoSignatureModal = function () {
+                demandeManager.stopWebcam();
+                const modal = document.getElementById("photoSignatureModal");
+                modal.style.display = "none";
+                demandeManager.currentDemandeIdForPhotoSig = null;
+            };
+
+            // Démarrer la webcam
+            demandeManager.startWebcam = async function () {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { width: 300, height: 225, facingMode: "user" },
+                    });
+                    demandeManager.webcamStream = stream;
+                    const video = document.getElementById("webcamVideo");
+                    video.srcObject = stream;
+                    video.style.display = "block";
+                    document.getElementById("photoPlaceholder").style.display =
+                        "none";
+                    document.getElementById("photoCanvas").style.display =
+                        "none";
+                    document.getElementById("startWebcamBtn").style.display =
+                        "none";
+                    document.getElementById("capturePhotoBtn").style.display =
+                        "inline-block";
+                    document.getElementById("capturePhotoBtn").disabled = false;
+                    document.getElementById("photoStatus").textContent =
+                        "🎥 Webcam active — cliquez sur Capturer";
+                    document.getElementById("photoStatus").style.color =
+                        "green";
+                } catch (err) {
+                    console.error("Erreur webcam:", err);
+                    let msg = "Impossible d'accéder à la webcam.";
+                    if (err.name === "NotAllowedError")
+                        msg =
+                            "❌ Permission refusée. Autorisez la caméra dans votre navigateur.";
+                    else if (err.name === "NotFoundError")
+                        msg = "❌ Aucune caméra détectée.";
+                    document.getElementById("photoStatus").textContent = msg;
+                    document.getElementById("photoStatus").style.color = "red";
+                }
+            };
+
+            // Capturer la photo depuis la webcam
+            demandeManager.capturePhoto = function () {
+                const video = document.getElementById("webcamVideo");
+                const canvas = document.getElementById("photoCanvas");
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                video.style.display = "none";
+                canvas.style.display = "block";
+                document.getElementById("capturePhotoBtn").style.display =
+                    "none";
+                document.getElementById("retakePhotoBtn").style.display =
+                    "inline-block";
+                document.getElementById("photoStatus").textContent =
+                    "✅ Photo capturée";
+                document.getElementById("photoStatus").style.color = "green";
+                demandeManager.photoCaptured = true;
+                demandeManager.stopWebcam();
+            };
+
+            // Reprendre la photo
+            demandeManager.retakePhoto = function () {
+                demandeManager.photoCaptured = false;
+                document.getElementById("photoCanvas").style.display = "none";
+                document.getElementById("retakePhotoBtn").style.display =
+                    "none";
+                document.getElementById("capturePhotoBtn").style.display =
+                    "none";
+                document.getElementById("startWebcamBtn").style.display =
+                    "inline-block";
+                document.getElementById("photoPlaceholder").style.display =
+                    "flex";
+                document.getElementById("photoStatus").textContent = "";
+            };
+
+            // Arrêter la webcam
+            demandeManager.stopWebcam = function () {
+                if (demandeManager.webcamStream) {
+                    demandeManager.webcamStream
+                        .getTracks()
+                        .forEach((track) => track.stop());
+                    demandeManager.webcamStream = null;
+                }
+            };
+
+            // Initialiser le canvas de signature
+            demandeManager.initSignatureCanvas = function () {
+                const canvas = document.getElementById("signatureCanvas");
+                if (!canvas) return;
+
+                // Supprimer les anciens event listeners en clonant le canvas
+                const newCanvas = canvas.cloneNode(true);
+                canvas.parentNode.replaceChild(newCanvas, canvas);
+
+                const newCtx = newCanvas.getContext("2d");
+                newCtx.clearRect(0, 0, newCanvas.width, newCanvas.height);
+                newCtx.fillStyle = "white";
+                newCtx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+                newCtx.strokeStyle = "#000000";
+                newCtx.lineWidth = 2;
+                newCtx.lineCap = "round";
+                newCtx.lineJoin = "round";
+                newCtx.fillStyle = "#ccc";
+                newCtx.font = "14px Roboto, sans-serif";
+                newCtx.textAlign = "center";
+                newCtx.fillText(
+                    "Signez ici avec votre souris ou trackpad",
+                    newCanvas.width / 2,
+                    newCanvas.height / 2,
+                );
+                newCtx.textAlign = "left";
+
+                // Mettre à jour le strokeStyle selon le select
+                const colorSelect = document.getElementById("signatureColor");
+                if (colorSelect) newCtx.strokeStyle = colorSelect.value;
+
+                demandeManager.signatureHasContent = false;
+
+                let isDrawing = false;
+                let lastX = 0;
+                let lastY = 0;
+
+                newCanvas.addEventListener("mousedown", function (e) {
+                    e.preventDefault();
+                    isDrawing = true;
+                    if (!demandeManager.signatureHasContent) {
+                        newCtx.clearRect(
+                            0,
+                            0,
+                            newCanvas.width,
+                            newCanvas.height,
+                        );
+                        newCtx.fillStyle = "white";
+                        newCtx.fillRect(
+                            0,
+                            0,
+                            newCanvas.width,
+                            newCanvas.height,
+                        );
+                        newCtx.strokeStyle =
+                            document.getElementById("signatureColor")?.value ||
+                            "#000000";
+                        demandeManager.signatureHasContent = true;
+                    }
+                    const rect = newCanvas.getBoundingClientRect();
+                    const scaleX = newCanvas.width / rect.width;
+                    const scaleY = newCanvas.height / rect.height;
+                    lastX = (e.clientX - rect.left) * scaleX;
+                    lastY = (e.clientY - rect.top) * scaleY;
+                    newCtx.beginPath();
+                    newCtx.moveTo(lastX, lastY);
+                    document.getElementById("signatureStatus").textContent =
+                        "✍️ Signature en cours...";
                 });
 
-                const result = await response.json();
+                newCanvas.addEventListener("mousemove", function (e) {
+                    e.preventDefault();
+                    if (!isDrawing) return;
+                    const rect = newCanvas.getBoundingClientRect();
+                    const scaleX = newCanvas.width / rect.width;
+                    const scaleY = newCanvas.height / rect.height;
+                    const x = (e.clientX - rect.left) * scaleX;
+                    const y = (e.clientY - rect.top) * scaleY;
+                    newCtx.lineTo(x, y);
+                    newCtx.stroke();
+                    lastX = x;
+                    lastY = y;
+                });
 
-                if (!response.ok) {
-                    throw new Error(result.error || 'Erreur lors du verrouillage');
-                }
-
-                utils.showAlert('✅ Demande verrouillée (SCAN TERMINÉ)', 'success');
-                
-                // Recharger les demandes pour mettre à jour l'affichage
-                await demandeManager.loadDemandes();
-
-            } catch (error) {
-                console.error('Erreur verrouillage:', error);
-                utils.showAlert('❌ ' + error.message, 'danger');
-            }
-        };
-
-        // FONCTION 4: Éditer une demande
-        demandeManager.editDemande = function(demandeId) {
-            const demande = demandeManager.allDemandes.find(d => d.id === demandeId);
-            
-            if (!demande) {
-                utils.showAlert('❌ Demande non trouvée', 'danger');
-                return;
-            }
-            
-            // Vérifier si verrouillée
-            const isVerrouille = demande.statutDemandes && 
-                demande.statutDemandes.some(s => s.statut && s.statut.id === 'SCAN_TERMINE');
-            
-            if (isVerrouille) {
-                utils.showAlert('❌ Cette demande est verrouillée (SCAN TERMINÉ) et ne peut pas être modifiée', 'danger');
-                return;
-            }
-            
-            // Ouvrir le formulaire en mode édition
-            const modal = document.getElementById('demandeModal');
-            const form = document.getElementById('demandeForm');
-            const title = document.getElementById('modalTitle');
-            
-            if (!modal || !form) return;
-            
-            form.reset();
-            title.textContent = 'Modifier la Demande #' + demandeId;
-            form.dataset.id = demandeId;
-            
-            // Pré-remplir les champs avec les données existantes
-            setTimeout(() => {
-                document.getElementById('categorie').value = demande.categorie?.id || '';
-                document.getElementById('typeVisa').value = demande.typeVisa?.id || '';
-                document.getElementById('demandeur').value = demande.demandeur?.id || '';
-                
-                if (demande.createdAt) {
-                    // The date input expects yyyy-MM-dd format
-                    document.getElementById('dateDemande').value = new Date(demande.createdAt).toISOString().split('T')[0];
-                }
-                document.getElementById('observations').value = demande.observations || '';
-            }, 100); // setTimeout to ensure dropdowns are populated
-            
-            modal.style.display = 'block';
-        };
-
-        // FONCTION 5: Supprimer une demande
-        demandeManager.deleteDemande = async function(demandeId) {
-            if (!confirm('Êtes-vous sûr de vouloir supprimer cette demande ?\n\nCette action est irréversible.')) {
-                return;
-            }
-
-            try {
-                // Appel API pour supprimer
-                const response = await fetch('/visa-backoffice/api/demandes/' + demandeId, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
+                newCanvas.addEventListener("mouseup", function (e) {
+                    e.preventDefault();
+                    isDrawing = false;
+                    if (demandeManager.signatureHasContent) {
+                        document.getElementById("signatureStatus").textContent =
+                            "✅ Signature dessinée";
+                        document.getElementById("signatureStatus").style.color =
+                            "green";
                     }
                 });
 
-                const result = await response.json();
+                newCanvas.addEventListener("mouseleave", function () {
+                    isDrawing = false;
+                });
 
-                if (!response.ok) {
-                    throw new Error(result.message || result.error || 'Erreur lors de la suppression');
+                newCanvas.addEventListener(
+                    "touchstart",
+                    function (e) {
+                        e.preventDefault();
+                        isDrawing = true;
+                        if (!demandeManager.signatureHasContent) {
+                            newCtx.clearRect(
+                                0,
+                                0,
+                                newCanvas.width,
+                                newCanvas.height,
+                            );
+                            newCtx.fillStyle = "white";
+                            newCtx.fillRect(
+                                0,
+                                0,
+                                newCanvas.width,
+                                newCanvas.height,
+                            );
+                            newCtx.strokeStyle =
+                                document.getElementById("signatureColor")
+                                    ?.value || "#000000";
+                            demandeManager.signatureHasContent = true;
+                        }
+                        const rect = newCanvas.getBoundingClientRect();
+                        const scaleX = newCanvas.width / rect.width;
+                        const scaleY = newCanvas.height / rect.height;
+                        lastX = (e.touches[0].clientX - rect.left) * scaleX;
+                        lastY = (e.touches[0].clientY - rect.top) * scaleY;
+                        newCtx.beginPath();
+                        newCtx.moveTo(lastX, lastY);
+                    },
+                    { passive: false },
+                );
+
+                newCanvas.addEventListener(
+                    "touchmove",
+                    function (e) {
+                        e.preventDefault();
+                        if (!isDrawing) return;
+                        const rect = newCanvas.getBoundingClientRect();
+                        const scaleX = newCanvas.width / rect.width;
+                        const scaleY = newCanvas.height / rect.height;
+                        const x = (e.touches[0].clientX - rect.left) * scaleX;
+                        const y = (e.touches[0].clientY - rect.top) * scaleY;
+                        newCtx.lineTo(x, y);
+                        newCtx.stroke();
+                        lastX = x;
+                        lastY = y;
+                    },
+                    { passive: false },
+                );
+
+                newCanvas.addEventListener(
+                    "touchend",
+                    function (e) {
+                        e.preventDefault();
+                        isDrawing = false;
+                        if (demandeManager.signatureHasContent) {
+                            document.getElementById(
+                                "signatureStatus",
+                            ).textContent = "✅ Signature dessinée";
+                            document.getElementById(
+                                "signatureStatus",
+                            ).style.color = "green";
+                        }
+                    },
+                    { passive: false },
+                );
+
+                // Stocker le nouveau canvas et contexte
+                demandeManager._signatureCanvas = newCanvas;
+                demandeManager._signatureCtx = newCtx;
+            };
+
+            // Effacer la signature
+            demandeManager.clearSignature = function () {
+                const canvas =
+                    demandeManager._signatureCanvas ||
+                    document.getElementById("signatureCanvas");
+                const ctx = canvas.getContext("2d");
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "white";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#ccc";
+                ctx.font = "14px Roboto, sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText(
+                    "Signez ici avec votre souris ou trackpad",
+                    canvas.width / 2,
+                    canvas.height / 2,
+                );
+                ctx.textAlign = "left";
+                demandeManager.signatureHasContent = false;
+                document.getElementById("signatureStatus").textContent = "";
+            };
+
+            // Changer la couleur de la signature
+            demandeManager.changeSignatureColor = function () {
+                const color = document.getElementById("signatureColor").value;
+                const canvas =
+                    demandeManager._signatureCanvas ||
+                    document.getElementById("signatureCanvas");
+                const ctx = canvas.getContext("2d");
+                ctx.strokeStyle = color;
+            };
+
+            // Enregistrer photo et signature
+            demandeManager.savePhotoAndSignature = async function () {
+                const demandeId = demandeManager.currentDemandeIdForPhotoSig;
+                if (!demandeId) return;
+
+                const demande = demandeManager.allDemandes.find(
+                    (d) => d.id === demandeId,
+                );
+                const alreadyHasPhoto = demande && demande.photoPath;
+                const alreadyHasSignature = demande && demande.signaturePath;
+
+                let photoSaved = !!alreadyHasPhoto;
+                let signatureSaved = !!alreadyHasSignature;
+
+                // Sauvegarder la photo si capturée
+                if (demandeManager.photoCaptured) {
+                    try {
+                        const photoCanvas =
+                            document.getElementById("photoCanvas");
+                        const photoData = photoCanvas.toDataURL(
+                            "image/jpeg",
+                            0.9,
+                        );
+
+                        const response = await fetch(
+                            "/visa-backoffice/api/demandes/" +
+                                demandeId +
+                                "/upload-photo",
+                            {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ photoData: photoData }),
+                            },
+                        );
+
+                        const result = await response.json();
+                        if (!response.ok)
+                            throw new Error(
+                                result.error || "Erreur upload photo",
+                            );
+                        photoSaved = true;
+                    } catch (error) {
+                        utils.showAlert(
+                            "❌ Erreur lors de la sauvegarde de la photo: " +
+                                error.message,
+                            "danger",
+                        );
+                        return;
+                    }
                 }
 
-                utils.showAlert('✅ Demande supprimée avec succès', 'success');
-                
-                // Recharger les demandes
+                // Sauvegarder la signature si dessinée
+                if (demandeManager.signatureHasContent) {
+                    try {
+                        const sigCanvas =
+                            demandeManager._signatureCanvas ||
+                            document.getElementById("signatureCanvas");
+                        const signatureData = sigCanvas.toDataURL("image/png");
+
+                        const response = await fetch(
+                            "/visa-backoffice/api/demandes/" +
+                                demandeId +
+                                "/upload-signature",
+                            {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    signatureData: signatureData,
+                                }),
+                            },
+                        );
+
+                        const result = await response.json();
+                        if (!response.ok)
+                            throw new Error(
+                                result.error || "Erreur upload signature",
+                            );
+                        signatureSaved = true;
+                    } catch (error) {
+                        utils.showAlert(
+                            "❌ Erreur lors de la sauvegarde de la signature: " +
+                                error.message,
+                            "danger",
+                        );
+                        return;
+                    }
+                }
+
+                if (
+                    !demandeManager.photoCaptured &&
+                    !demandeManager.signatureHasContent
+                ) {
+                    utils.showAlert(
+                        "⚠️ Veuillez capturer une photo et/ou dessiner une signature avant d'enregistrer",
+                        "warning",
+                    );
+                    return;
+                }
+
+                let msg = "";
+                if (photoSaved && signatureSaved)
+                    msg = "✅ Photo et signature enregistrées avec succès !";
+                else if (photoSaved)
+                    msg =
+                        "✅ Photo enregistrée. Pensez à ajouter la signature.";
+                else if (signatureSaved)
+                    msg =
+                        "✅ Signature enregistrée. Pensez à ajouter la photo.";
+
+                utils.showAlert(msg, "success");
+                demandeManager.closePhotoSignatureModal();
                 await demandeManager.loadDemandes();
+            };
 
-            } catch (error) {
-                console.error('Erreur suppression:', error);
-                utils.showAlert('❌ Erreur lors de la suppression: ' + error.message, 'danger');
-            }
-        };
-
-        // Ajouter les styles pour les badges
-        const style = document.createElement('style');
-        style.textContent = `
+            // Ajouter les styles pour les badges
+            const style = document.createElement("style");
+            style.textContent = `
             .stats-container {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
                 gap: 1rem;
                 margin-bottom: 2rem;
             }
-            
+
             .stat-card {
                 background: white;
                 padding: 1.5rem;
@@ -619,52 +1652,52 @@
                 box-shadow: var(--shadow);
                 text-align: center;
             }
-            
+
             .stat-card h3 {
                 color: var(--primary-color);
                 margin-bottom: 0.5rem;
                 font-size: 1rem;
             }
-            
+
             .stat-card p {
                 font-size: 1.5rem;
                 font-weight: 700;
                 margin: 0;
             }
-            
+
             .badge {
                 padding: 0.25rem 0.5rem;
                 border-radius: 12px;
                 font-size: 0.75rem;
                 font-weight: 600;
             }
-            
+
             .badge-success {
                 background: var(--success-color);
                 color: white;
             }
-            
+
             .badge-warning {
                 background: var(--warning-color);
                 color: var(--dark-text);
             }
-            
+
             .badge-info {
                 background: var(--accent-color);
                 color: white;
             }
-            
+
             .search-filters {
                 display: flex;
                 gap: 1rem;
                 flex-wrap: wrap;
                 align-items: center;
             }
-            
+
             .search-input {
                 min-width: 150px;
             }
-            
+
             .nav-links a.active {
                 background-color: rgba(255, 255, 255, 0.2);
                 border-radius: 5px;
@@ -684,41 +1717,41 @@
             .btn:disabled:hover {
                 background-color: inherit;
             }
-            
+
             @media (max-width: 768px) {
                 .search-filters {
                     flex-direction: column;
                     align-items: stretch;
                 }
-                
+
                 .search-input {
                     min-width: auto;
                 }
-                
+
                 .stats-container {
                     grid-template-columns: repeat(2, 1fr);
                 }
             }
         `;
-        document.head.appendChild(style);
+            document.head.appendChild(style);
 
-        // Charger les statistiques au chargement de la page
-        // Note: loadReferenceData() et loadDemandes() sont déjà appelés par app.js
-        document.addEventListener('DOMContentLoaded', function() {
-            demandeManager.loadStats();
-        });
+            // Charger les statistiques au chargement de la page
+            // Note: loadReferenceData() et loadDemandes() sont déjà appelés par app.js
+            document.addEventListener("DOMContentLoaded", function () {
+                demandeManager.loadStats();
+            });
 
-        // Ajouter le support des raccourcis clavier
-        document.addEventListener('keydown', function(event) {
-            if (event.ctrlKey && event.key === 'n') {
-                event.preventDefault();
-                demandeManager.showDemandeForm();
-            }
-            if (event.ctrlKey && event.key === 'f') {
-                event.preventDefault();
-                document.getElementById('searchInput').focus();
-            }
-        });
-    </script>
-</body>
+            // Ajouter le support des raccourcis clavier
+            document.addEventListener("keydown", function (event) {
+                if (event.ctrlKey && event.key === "n") {
+                    event.preventDefault();
+                    demandeManager.showDemandeForm();
+                }
+                if (event.ctrlKey && event.key === "f") {
+                    event.preventDefault();
+                    document.getElementById("searchInput").focus();
+                }
+            });
+        </script>
+    </body>
 </html>

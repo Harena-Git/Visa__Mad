@@ -1,0 +1,14 @@
+Sprint 5
+{
+Avant scan terminé 
+Ajoutée dans la saisie information demandeur/fiche demande
+Possibilité prendre photo avec la web cam
+Faire une signature grace à Tracpad ou souris
+Avant scan terminé 
+Ajoutée photo et signature terminée 
+Rattaché à la demande
+
+Le scan peut pas etre terminé avant que la photo et la signature ne soit ajouté 
+
+Pendant l’export pdf, afficher la photo et la signature 
+}
