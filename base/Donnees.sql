@@ -1,7 +1,7 @@
 -- =========================================
--- DONNÉES CONSOLIDÉES POUR TOUTES LES TABLES
+-- DONNeES CONSOLIDeES POUR TOUTES LES TABLES
 -- =========================================
--- Ce fichier contient tous les données de test et de configuration
+-- Ce fichier contient tous les donnees de test et de configuration
 -- =========================================
 
 -- =====================================================
@@ -12,7 +12,7 @@ INSERT INTO type_visa (id_type_visa, libelle) VALUES
 ('TV2', 'TRAVAILLEUR'),
 ('TV001', 'Visa Touristique'),
 ('TV002', 'Visa Affaires'),
-('TV003', 'Visa Étudiant'),
+('TV003', 'Visa etudiant'),
 ('TV004', 'Visa Travail'),
 ('TV005', 'Visa Familial'),
 ('TV_TEST', 'Visa Test')
@@ -24,22 +24,22 @@ ON CONFLICT (id_type_visa) DO NOTHING;
 INSERT INTO situation_famille (id_situation_famille, libelle) VALUES
 ('SF1', 'CELIBATAIRE'),
 ('SF2', 'MARIE'),
-('SF001', 'Célibataire'),
-('SF002', 'Marié'),
-('SF003', 'Divorcé'),
+('SF001', 'Celibataire'),
+('SF002', 'Marie'),
+('SF003', 'Divorce'),
 ('SF004', 'Veuf(ve)'),
 ('SF005', 'Concubinage'),
 ('SF_TEST', 'Situation Test')
 ON CONFLICT (id_situation_famille) DO NOTHING;
 
 -- =====================================================
--- 3. INSERTION DES CATÉGORIES DE DEMANDE
+-- 3. INSERTION DES CATeGORIES DE DEMANDE
 -- =====================================================
 INSERT INTO categorie_demande (id_categorie, libelle) VALUES
 ('CD1', 'NOUVEAU'),
 ('CD2', 'DUPLICATA'),
 ('CD3', 'TRANSFERT'),
-('CAT001', 'Première demande'),
+('CAT001', 'Premiere demande'),
 ('CAT002', 'Renouvellement'),
 ('CAT003', 'Transformation'),
 ('CAT004', 'Duplicata'),
@@ -49,14 +49,14 @@ INSERT INTO categorie_demande (id_categorie, libelle) VALUES
 ON CONFLICT (id_categorie) DO NOTHING;
 
 -- =====================================================
--- 4. INSERTION DES NATIONALITÉS
+-- 4. INSERTION DES NATIONALITeS
 -- =====================================================
 INSERT INTO nationalite (id_nationalite, libelle) VALUES
 ('NAT1', 'MALGACHE'),
 ('NAT2', 'FRANCAISE'),
 ('NAT001', 'Malgache'),
 ('NAT002', 'Français'),
-('NAT003', 'Américain'),
+('NAT003', 'Americain'),
 ('NAT_TEST', 'Test'),
 ('NAT004', 'Australien'),
 ('NAT005', 'Allemand')
@@ -71,16 +71,16 @@ INSERT INTO statut (id_statut, libelle) VALUES
 ('ST3', 'VISA_APPROUVE'),
 ('SCAN_TERMINE', 'SCAN TERMINE'),
 ('STAT_TEST', 'Test'),
-('CREATED', 'Créé'),
+('CREATED', 'Cre'),
 ('SUBMITTED', 'Soumis'),
-('APPROVED', 'Approuvé'),
-('REJECTED', 'Rejeté'),
+('APPROVED', 'Approuve'),
+('REJECTED', 'Rejete'),
 ('ST001', 'En attente'),
 ('ST002', 'En cours de traitement'),
-('ST003', 'Approuvé'),
-('ST004', 'Rejeté'),
-('ST010', 'Complété'),
-('ST011', 'Visa Approuvé'),
+('ST003', 'Approuve'),
+('ST004', 'Rejete'),
+('ST010', 'Complete'),
+('ST011', 'Visa Approuve'),
 ('STAT001', 'CREATED'),
 ('STAT002', 'SCAN_TERMINE'),
 ('STAT003', 'VISA_APPROVED')
@@ -93,12 +93,12 @@ INSERT INTO champs (id_champs, libelle, est_obligatoire) VALUES
 ('CH001', 'Nom complet', 1),
 ('CH002', 'Date de naissance', 1),
 ('CH003', 'Adresse', 1),
-('CH004', 'Téléphone', 1),
+('CH004', 'Telephone', 1),
 ('CH005', 'Email', 0)
 ON CONFLICT (id_champs) DO NOTHING;
 
 -- =====================================================
--- 7. INSERTION DES PIÈCES REQUISES
+-- 7. INSERTION DES PIeCES REQUISES
 -- =====================================================
 INSERT INTO piece (id_piece, libelle, est_obligatoire, id_type_visa) VALUES
 ('P1', 'Passeport', 1, 'TV1'),
@@ -107,14 +107,14 @@ INSERT INTO piece (id_piece, libelle, est_obligatoire, id_type_visa) VALUES
 ('P4', 'Contrat de travail', 1, 'TV2'),
 ('P5', 'Lettre employeur', 0, 'TV2'),
 ('PIECE001', 'Passeport', 1, 'TV001'),
-('PIECE002', 'Photo d''identité', 1, 'TV001'),
+('PIECE002', 'Photo d''identite', 1, 'TV001'),
 ('P001', 'Passeport valide', 1, 'TV001'),
-('P002', 'Photo d''identité', 1, 'TV001'),
+('P002', 'Photo d''identite', 1, 'TV001'),
 ('P003', 'Justificatif de domicile', 1, 'TV001'),
 ('P004', 'Lettre d''invitation', 0, 'TV001'),
 ('P005', 'Contrat de travail', 1, 'TV004'),
 ('P006', 'Attestation d''inscription', 1, 'TV003'),
-('P007', 'Relevés bancaires', 1, 'TV002'),
+('P007', 'Releves bancaires', 1, 'TV002'),
 ('P008', 'Certificat de mariage', 1, 'TV005')
 ON CONFLICT (id_piece) DO NOTHING;
 
@@ -126,7 +126,7 @@ INSERT INTO demandeur (id_demandeur, nom, prenom, nom_jeune_fille, dtn, adresse_
 ('D2', 'DUPONT', 'Marie', NULL, '1990-03-15', 'Paris', '0330000000', 'marie@mail.com', CURRENT_DATE, CURRENT_DATE, 'NAT2', 'SF2'),
 ('DEM001', 'RAKOTO', 'Jean', NULL, '1995-05-15', '123 Rue de l''Ecole, Antananarivo', '261340012345', 'jean.rakoto@email.com', '2026-04-20', '2026-04-20', 'NAT001', 'SF001'),
 ('DEM002', 'DUPONT', 'Marie', 'MARTIN', '1992-08-22', '456 Rue de la Paix, Antananarivo', '261340054321', 'marie.dupont@email.com', '2026-04-21', '2026-04-21', 'NAT002', 'SF002'),
-('DEM003', 'SMITH', 'David', NULL, '1998-03-30', '789 Rue de la Liberté, Antananarivo', '261340098765', 'david.smith@email.com', '2026-04-19', '2026-04-19', 'NAT003', 'SF001'),
+('DEM003', 'SMITH', 'David', NULL, '1998-03-30', '789 Rue de la Liberte, Antananarivo', '261340098765', 'david.smith@email.com', '2026-04-19', '2026-04-19', 'NAT003', 'SF001'),
 ('DEM004', 'BERNARD', 'Sophie', 'LEONARD', '1994-12-08', '321 Rue des Fleurs, Antananarivo', '261340055555', 'sophie.bernard@email.com', '2026-04-22', '2026-04-22', 'NAT002', 'SF003'),
 ('DEM_TEST_001', 'TEST', 'User', NULL, '1990-01-01', '123 Rue Test', '261340000000', 'test@test.com', NOW(), NOW(), 'NAT_TEST', 'SF_TEST'),
 ('DEM_TEST_002', 'Harena', 'Harena', NULL, '2003-04-13', '123 Rue Andoram', '2034213', 'harena@test.com', NOW(), NOW(), 'NAT_TEST', 'SF_TEST'),
@@ -191,7 +191,7 @@ INSERT INTO visa_transformable (id_visa_transformable, ref_visa, date_debut, dat
 ON CONFLICT (id_visa_transformable) DO NOTHING;
 
 -- =====================================================
--- 13. INSERTION DES CARTES DE RÉSIDENCE
+-- 13. INSERTION DES CARTES DE ReSIDENCE
 -- =====================================================
 INSERT INTO carte_residence (id_carte_residence, ref_carte_residence, date_debut, date_fin, id_passport, id_demande) VALUES
 ('CR1', 'CR001', '2025-01-01', '2026-01-01', 'PASS1', 'DEM1'),
@@ -211,7 +211,7 @@ INSERT INTO statut_demande (id_statut_demande, date_, id_statut, id_demande) VAL
 ON CONFLICT (id_statut_demande) DO NOTHING;
 
 -- =====================================================
--- 15. INSERTION DES VÉRIFICATIONS DE PIÈCES
+-- 15. INSERTION DES VeRIFICATIONS DE PIeCES
 -- =====================================================
 INSERT INTO check_piece (id_demande, id_piece, est_fourni, updated_at, file_name, file_type) VALUES
 ('DEM1', 'P1', TRUE, CURRENT_DATE, 'passport_jean.pdf', 'application/pdf'),
