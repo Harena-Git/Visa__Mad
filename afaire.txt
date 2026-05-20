@@ -12,3 +12,20 @@ Le scan peut pas etre terminé avant que la photo et la signature ne soit ajout�
 
 Pendant l’export pdf, afficher la photo et la signature 
 }
+
+Sprint 6 {
+1-
+Quand l’état/status est sur photo prise, les informations peuvent encore êtres modifiés 
+Puis piece justificative
+Scan terminé 
+
+Page fiche de demande avec les informations de la demande avec bouton pour faire des choses pour que le scan soit terminé 
+1bouton pour avoir une aperçu de toutes  les pièces justificatif par ordre d’Insertion
+On aura une table piece justificatif pour pouvoir avoir plusieurs pièces justificatif 
+1 autre bouton qui va retourner un bouton avec comme message 
+Voaray ny dossier anao
++ qr code
++ sary et information 
+
+Ce 2 ème bouton ne peut pas être appuyer avant scan terminé 
+}
